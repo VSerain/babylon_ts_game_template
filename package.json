@@ -1,0 +1,21 @@
+{
+  "name": "game_template",
+  "version": "0.0.1",
+  "description": "A simply template for game with BABYLONJS and TypeScript",
+  "main": "index.js",
+  "scripts": {
+    "watch": "webpack --watch & python3 -m http.server 3066",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Victor Serain",
+  "license": "MIT",
+  "devDependencies": {
+    "ts-loader": "^6.2.2",
+    "typescript": "^3.8.3",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
+  },
+  "dependencies": {
+    "babylonjs": "^4.1.0"
+  }
+}

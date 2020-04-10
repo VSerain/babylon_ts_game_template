@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "outDir": "./public/",
+        "noImplicitAny": true,
+        "sourceMap": true,
+        "target": "es5",
+        "allowJs": true,
+        "types": [
+            "babylonjs",
+        ],
+        "strictNullChecks": true, 
+        "module": "amd", 
+    }
+}
