@@ -23,7 +23,7 @@ export default class GraphicsEngine extends DefaultEngine {
     __init__(canvas: HTMLCanvasElement) {
         this.$canvas = canvas;
         this.$scene = new Scene(this);
-        this.camera = new MainCamera(this, new BABYLON.Vector3(0, 10, 0),  new BABYLON.Vector3(0, 10, -5));
+        this.camera = new MainCamera(this, new BABYLON.Vector3(-24, 44, 29),  new BABYLON.Vector3(0,0,0));
     }
 
     render() {

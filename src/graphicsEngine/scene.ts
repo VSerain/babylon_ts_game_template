@@ -1,21 +1,49 @@
 import * as BABYLON from "babylonjs";
+import "babylonjs-loaders"
+
 import GraphicsEngine from "./index";
 
 export default class Scene extends BABYLON.Scene {
     constructor(private graphicsEngine: GraphicsEngine) {
         super(graphicsEngine.$engine);
+        
+        this.gravity = new BABYLON.Vector3(0, -9.81, 0);
+        
+        this.enablePhysics(this.gravity);
+        this.collisionsEnabled = true;
+
         this.createScene();
     }
 
     private createScene() {
-        const light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0,1,0), this);
-        
-        BABYLON.GroundBuilder.CreateGround("defaultGround", { width: 200, height: 200 }, this);
+        const ground = BABYLON.GroundBuilder.CreateGround("ground", { width: 100, height: 100}, this);
 
-        const boxMesh = BABYLON.BoxBuilder.CreateBox("block1", {width: 10, height: 20, depth: 10 }, this);
+        this.graphicsEngine.loadStructure({
+            type: "ground-entity",
+            mesh: ground
+        });
 
-        this.graphicsEngine.loadStructure({type: "object-entity", mesh: boxMesh, data: {
-            position: new BABYLON.Vector3(15, 1, -20),
-        }});
+        BABYLON.SceneLoader.Append("assets/glb/", "test3.glb", this, () => {
+            this.createDefaultLight(true);
+            this.meshes.forEach(mesh => {
+
+                if (mesh.metadata && mesh.metadata.structure) return;
+
+                let type = "default-entity";
+                let data = {} as any;
+                if (mesh.metadata && mesh.metadata.gltf && mesh.metadata.gltf.extras) {
+                    data = mesh.metadata.gltf.extras;
+                    if (data.hasOwnProperty("type")) {
+                        type = data.type;
+                    }
+                }
+
+                this.graphicsEngine.loadStructure({
+                    type,
+                    mesh,
+                    data
+                })
+            });
+        });
     }
 }

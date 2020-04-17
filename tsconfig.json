@@ -7,6 +7,7 @@
         "allowJs": true,
         "types": [
             "babylonjs",
+            "babylonjs-loaders",
         ],
         "strictNullChecks": true, 
         "module": "amd", 

@@ -24,18 +24,9 @@ export default class GameEngine extends DefaultEngine {
         if (entityObject.type.length == 0) throw new Error("Type is not defined");
         const EntityClass = EntitiesClass.filter((EntityClass: any) => EntityClass.type === entityObject.type)[0];
         if (!EntityClass) throw new Error(`${entityObject.type} as not found in structuresClass`);
-        const entity = new EntityClass(entityObject.mesh);
-        
-        if (entityObject.data) {
-            const data = entityObject.data;
-
-            Object.keys(data).forEach((propName) => {
-                if (entity[propName]) {
-                    entity[propName] = data[propName];
-                }
-            });
-        }
-
+        const entity = new EntityClass(entityObject.mesh, entityObject.data);
+        entity.loadMixins();
+        this.structures.push(entity);
         return entity;
     }
 }
