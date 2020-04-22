@@ -1,5 +1,8 @@
 import * as BABYLON from "babylonjs"
 
+/**
+ * PlayerBody manage the camera Gravity and Colistion
+ */
 export default class PlayerBody {
 
     constructor(private camera: BABYLON.UniversalCamera) {

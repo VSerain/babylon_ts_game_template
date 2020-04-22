@@ -7,6 +7,9 @@ import EntitiesController from "../entities/index";
 
 import { TypesLoader } from "./interfaces";
 
+/**
+ * The Loader class is used for load the scene 
+ */
 export default class Loader {
     private typesLoader: TypesLoader = {};
     public scene: BABYLON.Scene;
@@ -18,23 +21,58 @@ export default class Loader {
 
     constructor(private engine: BABYLON.Engine, public canvas: HTMLCanvasElement) {}
 
+    /**
+     * Link mesh to the player structure
+     * 
+     * @param type is name of strucutre
+     */
     public addPlayerType(type: string) {
         this.addType("player", type);
     }
+
+    /**
+     * Link mesh to the scenery addMesh Method
+     * 
+     * @param type is name of strucutre
+     */
     public addSceneryType(type: string) {
         this.addType("scenery", type);
     }
+
+    /**
+     * Link mesh to the objects addMesh Method
+     * 
+     * @param type is name of strucutre
+     */
     public addObjectsType(type: string) {
         this.addType("objects", type);
     }
+
+    /**
+     * Link mesh to the entities addMesh Method
+     * 
+     * @param type is name of strucutre
+     */
     public addEnitiesType(type: string) {
         this.addType("entities", type);
     }
 
+    /**
+     * Link mesh to the controller addMesh Method
+     * 
+     * @param controllerName is the controller call when the mesh `type` is equals to `type` in params
+     * @param type is name of strucutre
+     */
     private addType(controllerName: string, type: string) {
         this.typesLoader[type] = controllerName;
     }
 
+    /**
+     * 
+     * @param type is the mesh type
+     * @param mesh
+     * @param data optional data from describe the futur entity/structure 
+     */
     private loadMesh(type: string, mesh: BABYLON.AbstractMesh, data?: any) {
         if (!this.typesLoader[type]) return;
         switch(this.typesLoader[type]) {
@@ -53,6 +91,9 @@ export default class Loader {
         }
     }
 
+    /**
+     * Is call from load the global scene
+     */
     loadScene() {
         this.scene = new BABYLON.Scene(this.engine);
 

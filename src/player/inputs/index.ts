@@ -2,6 +2,9 @@ import * as BABYLON from "babylonjs"
 
 import JumpInput from "./jumpInput"
 
+/**
+ * InputManager manage the player input
+ */
 export default class InputManager {
 
     private jumpInupt: JumpInput;

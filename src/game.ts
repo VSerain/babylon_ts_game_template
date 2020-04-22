@@ -11,7 +11,7 @@ import EntitiesController from "./entities/index";
 export default class Game {
 
     private canvas: HTMLCanvasElement;
-    private $engine: BABYLON.Engine;
+    private engine: BABYLON.Engine;
 
     private loader: Loader;
     private playerController: PlayerController;
@@ -19,13 +19,17 @@ export default class Game {
     private objectsController: ObjectsController;
     private entitiesController: EntitiesController;
 
+    /**
+     * 
+     * @param canvasId is the DOM id of the element canvas
+     */
     constructor(private canvasId: string) {
         this.canvas = document.getElementById(this.canvasId) as HTMLCanvasElement;
         if (!this.canvas) throw new Error(`${this.canvasId} is not found in DOM`);
 
-        this.$engine = new BABYLON.Engine(this.canvas, ENGINE_CONFIG.ANTIALIAS);
+        this.engine = new BABYLON.Engine(this.canvas, ENGINE_CONFIG.ANTIALIAS);
 
-        this.loader = new Loader(this.$engine, this.canvas);
+        this.loader = new Loader(this.engine, this.canvas);
         this.playerController = new PlayerController(this.loader);
         this.sceneryController = new SceneryController(this.loader);
         this.objectsController = new ObjectsController(this.loader);
@@ -33,7 +37,7 @@ export default class Game {
 
         this.loader.loadScene();
 
-        this.$engine.runRenderLoop(() => {
+        this.engine.runRenderLoop(() => {
             this.playerController.renderLoop();
             this.sceneryController.renderLoop();
             this.objectsController.renderLoop();
@@ -41,7 +45,7 @@ export default class Game {
         });
 
         window.addEventListener('resize', () => {
-            this.$engine.resize();
+            this.engine.resize();
         });
     }
 }

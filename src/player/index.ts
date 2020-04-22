@@ -15,12 +15,18 @@ export default class PlayerController {
         this.loader.addPlayerType("player-camera"); 
     }
 
+    /**
+     * Game loop
+     */
     renderLoop() {
         if (!this.camera) return;
         this.scene.render();
         this.inputManager.renderLoop();
     }
 
+    /**
+     * Is call by the loader when mesh added is corresponding to the player type
+     */
     addMesh(type: string, mesh: BABYLON.AbstractMesh, data?: any) {
         if (type === "player-camera") {
             this.camera = new BABYLON.UniversalCamera("player-camera", mesh.position.clone(), this.scene);
@@ -29,6 +35,9 @@ export default class PlayerController {
         }
     }
 
+    /**
+     * Init input and body to the camera
+     */
     initCamera() {
         this.inputManager = new InputManager(this.scene, this.camera, this.loader.canvas);
         this.body = new PlayerBody(this.camera);

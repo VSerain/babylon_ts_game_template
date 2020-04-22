@@ -15,29 +15,40 @@ export default class SceneryController {
         this.initType();
     }
 
+    /**
+     * Game loop
+     */
     renderLoop() {}
 
     get scene() {
         return this._scene;
     }
-
     set scene(scene: BABYLON.Scene) {
         this._scene = scene;
         this.initScene();
     }
 
+    /**
+     * Initailize the scene 
+     */
     initScene() {
         this.scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
         this.scene.enablePhysics(this.scene.gravity);
         this.scene.collisionsEnabled = true;
     }
 
+    /**
+     * Add scenery type to the loader
+     */
     initType() {
         Types.forEach(type => {
             this.loader.addSceneryType(type.name);
         });
     }
 
+    /**
+     * Is call by the loader when mesh added is corresponding to the player type
+     */
     addMesh(typeName: string, mesh: BABYLON.AbstractMesh, data?: any) {
         const type = Types.find((type) => type.name == typeName);
         if (!type) return;
@@ -46,6 +57,6 @@ export default class SceneryController {
         if (!mesh.metadata) mesh.metadata = {};
 
         mesh.metadata.instance = instance;
-        this.sceneObjects.push(instance) // Mesh as any is hack for limit typescript error
+        this.sceneObjects.push(instance);
     }
 }
