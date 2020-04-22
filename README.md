@@ -2,7 +2,7 @@
 A template for easy start a 3d webGl game with BabylonJS and TypeScript
 
 For install : 
- 1. `npm install -g webpack webpack-cli`
+ 1. `npm install -g webpack webpack-cli http-server`
  2. `npm install`
 
 For dev 

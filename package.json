@@ -4,7 +4,7 @@
   "description": "A simply template for game with BABYLONJS and TypeScript",
   "main": "index.js",
   "scripts": {
-    "watch": "webpack --watch & python3 -m http.server 3066",
+    "watch": "webpack --watch & http-server -p 3066",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Victor Serain",
