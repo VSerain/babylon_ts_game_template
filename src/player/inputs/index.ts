@@ -6,7 +6,7 @@ export default class InputManager {
 
     private jumpInupt: JumpInput;
 
-    constructor(private scene: BABYLON.Scene, private camera: BABYLON.FreeCamera, private canvas: HTMLCanvasElement) {
+    constructor(private scene: BABYLON.Scene, private camera: BABYLON.UniversalCamera, private canvas: HTMLCanvasElement) {
         this.canvas.requestPointerLock();
         this.jumpInupt = new JumpInput(this.scene);
         this.camera.inputs.add(this.jumpInupt);

@@ -2,7 +2,7 @@ import * as BABYLON from "babylonjs"
 
 export default class PlayerBody {
 
-    constructor(private camera: BABYLON.FreeCamera) {
+    constructor(private camera: BABYLON.UniversalCamera) {
         this.camera.applyGravity = true;
         this.camera.checkCollisions = true;
         this.camera.ellipsoid = new BABYLON.Vector3(1, 1.75, 1);

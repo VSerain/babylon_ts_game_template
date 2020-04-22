@@ -6,7 +6,7 @@ import PlayerBody from "./playerBody";
 
 export default class PlayerController {
     scene: BABYLON.Scene;
-    camera: BABYLON.FreeCamera;
+    camera: BABYLON.UniversalCamera;
     inputManager: InputManager;
     body: PlayerBody;
 
@@ -23,7 +23,7 @@ export default class PlayerController {
 
     addMesh(type: string, mesh: BABYLON.AbstractMesh, data?: any) {
         if (type === "player-camera") {
-            this.camera = new BABYLON.FreeCamera("player-camera", mesh.position.clone(), this.scene);
+            this.camera = new BABYLON.UniversalCamera("player-camera", mesh.position.clone(), this.scene);
             mesh.dispose();
             this.initCamera();
         }
