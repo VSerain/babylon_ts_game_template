@@ -2,57 +2,42 @@ import * as BABYLON from "babylonjs";
 
 import { ENGINE_CONFIG } from "./config";
 
-import GameEngine from "./gameEngine/index";
-import GraphicsEngine from "./graphicsEngine/index";
-import NetworkEngine from "./networkEngine/index";
-import SoundEngine from "./soundEngine/index";
+import Loader from "./loader/index";
+import PlayerController from "./player/index";
+import SceneryController from "./scenery/index";
+import ObjectsController from "./objects/index";
+import EntitiesController from "./entities/index";
+
 export default class Game {
 
-    private _canvas: HTMLCanvasElement;
+    private canvas: HTMLCanvasElement;
     private $engine: BABYLON.Engine;
 
-    private _gameEngine: GameEngine;
-    private _graphicsEngine: GraphicsEngine;
-    private _networkEngine: NetworkEngine;
-    private _soundEngine: SoundEngine;
+    private loader: Loader;
+    private playerController: PlayerController;
+    private sceneryController: SceneryController;
+    private objectsController: ObjectsController;
+    private entitiesController: EntitiesController;
 
-    constructor(private _canvasId: string) {
-        this._canvas = document.getElementById(this._canvasId) as HTMLCanvasElement;
-        if (!this._canvas) throw new Error(`${this._canvasId} is not found in DOM`);
+    constructor(private canvasId: string) {
+        this.canvas = document.getElementById(this.canvasId) as HTMLCanvasElement;
+        if (!this.canvas) throw new Error(`${this.canvasId} is not found in DOM`);
 
-        this.$engine = new BABYLON.Engine(this._canvas, ENGINE_CONFIG.ANTIALIAS);
+        this.$engine = new BABYLON.Engine(this.canvas, ENGINE_CONFIG.ANTIALIAS);
 
-        this._gameEngine = new GameEngine(this.$engine);
-        this._graphicsEngine = new GraphicsEngine(this.$engine);
-        this._networkEngine = new NetworkEngine(this.$engine);
-        this._soundEngine = new SoundEngine(this.$engine);
+        this.loader = new Loader(this.$engine, this.canvas);
+        this.playerController = new PlayerController(this.loader);
+        this.sceneryController = new SceneryController(this.loader);
+        this.objectsController = new ObjectsController(this.loader);
+        this.entitiesController = new EntitiesController(this.loader);
 
-        this._gameEngine.attachGraphicsEngine(this._graphicsEngine);
-        this._gameEngine.attachNetworkEngine(this._networkEngine);
-        this._gameEngine.attachSoundEngine(this._soundEngine);
-
-        this._graphicsEngine.attachGameEngine(this._gameEngine);
-        this._graphicsEngine.attachNetworkEngine(this._networkEngine);
-        this._graphicsEngine.attachSoundEngine(this._soundEngine);
-
-        this._networkEngine.attachGameEngine(this._gameEngine);
-        this._networkEngine.attachGraphicsEngine(this._graphicsEngine);
-        this._networkEngine.attachSoundEngine(this._soundEngine);
-
-        this._soundEngine.attachGameEngine(this._gameEngine);
-        this._soundEngine.attachGraphicsEngine(this._graphicsEngine);
-        this._soundEngine.attachNetworkEngine(this._networkEngine);
-
-        this._graphicsEngine.__init__(this._canvas); // Init the babylon scene
-        this._gameEngine.__init__();
-        this._networkEngine.__init__();
-        this._soundEngine.__init__();
+        this.loader.loadScene();
 
         this.$engine.runRenderLoop(() => {
-            this._networkEngine.render();
-            this._gameEngine.render();
-            this._soundEngine.render();
-            this._graphicsEngine.render();
+            this.playerController.renderLoop();
+            this.sceneryController.renderLoop();
+            this.objectsController.renderLoop();
+            this.entitiesController.renderLoop();
         });
 
         window.addEventListener('resize', () => {
