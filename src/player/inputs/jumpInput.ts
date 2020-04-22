@@ -1,6 +1,6 @@
 import * as BABYLON from "babylonjs";
 // C'est pas bon il faut faire un input par un ! 
-export default class JumpInput implements BABYLON.ICameraInput<BABYLON.FreeCamera> {
+export default class JumpInput implements BABYLON.ICameraInput<BABYLON.UniversalCamera> {
 
     constructor(private scene: BABYLON.Scene, public jumpHeight: number = 2) {}
 
@@ -10,7 +10,7 @@ export default class JumpInput implements BABYLON.ICameraInput<BABYLON.FreeCamer
 
     inJump: boolean = false;
 
-    camera: BABYLON.FreeCamera;
+    camera: BABYLON.UniversalCamera;
     getClassName() {
         return "JumpInput";
     }
@@ -41,13 +41,17 @@ export default class JumpInput implements BABYLON.ICameraInput<BABYLON.FreeCamer
         if (!this._keys.find((key: number) => evt.keyCode === key)) return;
         if (this.inJump) return;
         this.inJump = true;
-        this._onJump();
+        // this._onJump();
         if (!noPreventDefault) {
             evt.preventDefault();
         }
     }
 
-    renderLoop() {}
+    renderLoop() {
+        // if (this.inJump) {
+        //     this.camera.position.y += 1;
+        // }
+    }
 
     _onJump() {
         this.camera.animations = [];
