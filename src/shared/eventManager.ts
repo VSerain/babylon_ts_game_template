@@ -24,17 +24,41 @@ interface StackEvent extends Array<Event> {
 class EventManager {
     private events: StackEvent = [];
 
-    public add(eventName: string) {
-        this.events.push({
+    /**
+     * Register event
+     * 
+     * @param eventName is the name of event
+     */
+    public add(eventName: string): Event {
+        const foundEvent = this.events.find((event: Event) => event.name === eventName);
+        if (foundEvent) return foundEvent;
+
+        const event = {
             name: eventName,
             callbacks: []
-        });
+        };
+
+        this.events.push(event);
+
+        return event
     }
 
+    /**
+     * Register events
+     * 
+     * @param eventNames is the names of events
+     */
     public addMultiple(...eventNames: Array<string>) {
         eventNames.forEach(eventName => this.add(eventName));
     } 
 
+    /**
+     * Attach callback when event
+     * 
+     * @param eventName is the name of event
+     * @param option is for defined function filter or layer
+     * @param callback the callback attached to event
+     */
     public on(eventName: string, option: any, callback: CallbackFunction) {
         const event = this.getEventByName(eventName, true);
 
@@ -42,8 +66,7 @@ class EventManager {
 
         // Found pos in callback stack
         const position = event.callbacks.findIndex(cbObject => cbObject.option.layer > option.layer);
-
-        if (position) {
+        if (position != -1) {
             event.callbacks.splice(position, 0, {
                 callback,
                 option
@@ -57,6 +80,12 @@ class EventManager {
         }
     }
 
+    /**
+     * Call callbacks linked to the event
+     * 
+     * @param eventName is the name of event
+     * @param args argument send to callbacks
+     */
     public call(eventName: string, args: Array<any>) {
         const event = this.getEventByName(eventName);
         let stopCallback = false;
@@ -79,17 +108,18 @@ class EventManager {
         });
     }
 
+    /**
+     * Find event by name.
+     * 
+     * @param eventName the event name finded
+     * @param force if is true and event is not found this function create the event
+     */
     private getEventByName(eventName: string, force: boolean = false): Event {
         let event = this.events.find((event: Event) => event.name === eventName);
 
         if (!event) {
-            if (!force) throw new Error("The event ${eventName} is not found, please check if as been declared");
-            event = {
-                name: eventName,
-                callbacks: []
-            };
-
-            this.events.push(event);
+            if (!force) throw new Error(`The event ${eventName} is not found, please check if as been declared`);
+            event = this.add(eventName);
         }
     
         return event;

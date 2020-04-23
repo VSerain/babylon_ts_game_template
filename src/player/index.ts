@@ -5,7 +5,6 @@ import eventManager from "app/shared/eventManager";
 import Loader from "app/loader/index";
 import InputManager from "./inputs/index";
 import PlayerBody from "./playerBody";
-import { AbstractMesh } from "babylonjs";
 
 export default class PlayerController {
     scene: BABYLON.Scene;
@@ -16,10 +15,6 @@ export default class PlayerController {
     constructor(private loader: Loader) {
         this.loader.playerController = this;
         this.loader.addPlayerType("player-camera"); 
-
-        eventManager.on("onPlayerCollide", {}, (cbStop, mesh: AbstractMesh) => {
-            // console.log(mesh);
-        });
     }
 
     /**
