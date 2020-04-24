@@ -86,7 +86,7 @@ class EventManager {
      * @param eventName is the name of event
      * @param args argument send to callbacks
      */
-    public call(eventName: string, args: Array<any>) {
+    public call(eventName: string, args: Array<any> = []) {
         const event = this.getEventByName(eventName);
         let stopCallback = false;
 
