@@ -1,9 +1,11 @@
 import * as BABYLON from "babylonjs";
 
-import PlayerController from "../player/index";
-import SceneryController from "../scenery/index";
-import ObjectsController from "../objects/index";
-import EntitiesController from "../entities/index";
+import PlayerController from "app/player/index";
+import SceneryController from "app/scenery/index";
+import ObjectsController from "app/objects/index";
+import EntitiesController from "app/entities/index";
+
+import eventManager from "app/shared/eventManager";
 
 import { TypesLoader } from "./interfaces";
 
@@ -19,7 +21,9 @@ export default class Loader {
     public objectsController: ObjectsController;
     public entitiesController: EntitiesController;
 
-    constructor(private engine: BABYLON.Engine, public canvas: HTMLCanvasElement) {}
+    constructor(private engine: BABYLON.Engine, public canvas: HTMLCanvasElement) {
+        eventManager.add("loader.sceneLoaded");
+    }
 
     /**
      * Link mesh to the player structure
@@ -102,9 +106,6 @@ export default class Loader {
         this.sceneryController.scene = this.scene;
         this.entitiesController.scene = this.scene;
 
-        const ground = BABYLON.GroundBuilder.CreateGround("ground", { width: 100, height: 100}, this.scene);
-
-        this.loadMesh("ground", ground);
 
         BABYLON.SceneLoader.Append("assets/glb/", "test3.glb", this.scene, () => {
             this.scene.createDefaultLight();
@@ -120,9 +121,10 @@ export default class Loader {
                         type = data.type;
                     }
                 }
-
                 this.loadMesh(type, mesh, data);
             });
+
+            eventManager.call("loader.sceneLoaded", []);
         });
     }
 }

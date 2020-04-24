@@ -1,8 +1,10 @@
 import * as BABYLON from "babylonjs";
+import eventManager from "app/shared/eventManager";
 
-import Loader from "../loader/index";
+import Loader from "app/loader/index";
 
 import Types from "./types/index";
+import Ground from "./types/ground";
 
 export default class SceneryController {
     _scene: BABYLON.Scene;
@@ -13,6 +15,14 @@ export default class SceneryController {
         this.loader.sceneryController = this;
 
         this.initType();
+
+        eventManager.on("loader.sceneLoaded", { layer: 0}, () => {
+            if (this.sceneObjects.find(object => object instanceof Ground)) return;
+
+            const ground = BABYLON.GroundBuilder.CreateGround("ground", { width: 100, height: 100}, this.scene);
+
+            this.addMesh("ground", ground);
+        });
     }
 
     /**
