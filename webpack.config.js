@@ -19,7 +19,11 @@ let config = {
     },
     resolve: {
         extensions: [ '.tsx', '.ts', '.js' ],
+        alias: {
+            app: path.resolve(__dirname, 'src'),
+        }
     },
+    
 }
 
 module.exports = config;

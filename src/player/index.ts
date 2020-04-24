@@ -1,6 +1,8 @@
 import * as BABYLON from "babylonjs";
 
-import Loader from "../loader/index";
+import eventManager from "app/shared/eventManager";
+
+import Loader from "app/loader/index";
 import InputManager from "./inputs/index";
 import PlayerBody from "./playerBody";
 
