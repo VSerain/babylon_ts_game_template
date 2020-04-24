@@ -106,6 +106,17 @@ export default class Loader {
         this.sceneryController.scene = this.scene;
         this.entitiesController.scene = this.scene;
 
+        // remove me
+        const s = BABYLON.SphereBuilder.CreateSphere("sphere", {}, this.scene);
+        s.position.y = 2;
+        s.position.z = 6;
+        s.metadata = {
+            gltf: {
+                extras: {
+                    type: "default-button"
+                }
+            }
+        };
 
         BABYLON.SceneLoader.Append("assets/glb/", "test3.glb", this.scene, () => {
             this.scene.createDefaultLight();

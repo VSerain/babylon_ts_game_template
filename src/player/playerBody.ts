@@ -24,4 +24,8 @@ export default class PlayerBody {
             eventManager.call("onPlayerCollide", [collidedMesh]);
         }
     }
+
+    get position() {
+        return this.camera.position;
+    }
 }
