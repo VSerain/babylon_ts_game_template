@@ -28,4 +28,7 @@ export default class PlayerBody {
     get position() {
         return this.camera.position;
     }
+    set position(position) {
+        this.camera.position = position;
+    }
 }
