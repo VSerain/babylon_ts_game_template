@@ -34,6 +34,7 @@ export default class DefaultButton extends DefaultStructure {
 
     startEvent() {
         // TEST
-        this.sceneryController.sceneObjects[0].position = this.position.add(new BABYLON.Vector3(5,0,5));
+        console.log("button start annimation");
+        this.playerController.body.position.addInPlace(new BABYLON.Vector3(15, 0, 15));
     }
 }
