@@ -1,1 +1,1 @@
-export const MINIMAL_DIST_EVENT = 4;
+export const MINIMAL_DIST_EVENT = 6;

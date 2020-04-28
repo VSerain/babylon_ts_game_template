@@ -106,20 +106,9 @@ export default class Loader {
         this.sceneryController.scene = this.scene;
         this.entitiesController.scene = this.scene;
 
-        // remove me
-        const s = BABYLON.SphereBuilder.CreateSphere("sphere", {}, this.scene);
-        s.position.y = 2;
-        s.position.z = 6;
-        s.metadata = {
-            gltf: {
-                extras: {
-                    type: "default-button"
-                }
-            }
-        };
+        // this.__dev__spawnButton();
 
         BABYLON.SceneLoader.Append("assets/glb/", "test3.glb", this.scene, () => {
-            this.scene.createDefaultLight();
             this.scene.meshes.forEach(mesh => {
 
                 if (mesh.metadata && mesh.metadata.instance) return;
@@ -137,5 +126,40 @@ export default class Loader {
 
             eventManager.call("loader.sceneLoaded", []);
         });
+    }
+
+    __dev__spawnButton() {
+        const s = BABYLON.SphereBuilder.CreateSphere("sphere", {}, this.scene);
+        s.position.y = 2;
+        s.position.z = 6;
+        s.metadata = {
+            gltf: {
+                extras: {
+                    type: "default-button",
+                    animation: "proute",
+                    name: "first-button"
+                }
+            }
+        };
+
+        var anim = new BABYLON.Animation("proute", "position.y", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+        var keys = []; 
+
+        keys.push(
+            {
+                frame: 0,
+                value: s.position.y
+            },
+            {
+                frame: 50,
+                value: s.position.y + 2
+            },
+            {
+                frame: 100,
+                value: s.position.y
+            }
+        );
+        anim.setKeys(keys);
+        s.animations.push(anim);
     }
 }

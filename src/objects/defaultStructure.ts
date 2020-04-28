@@ -13,7 +13,11 @@ export default class DefaultStructure {
         sceneryController: false,
     }
 
-    constructor(private mesh: BABYLON.Mesh) {}
+    name: string = (new Date().getTime() + Math.random() * Math.random()).toString();
+
+    constructor(protected mesh: BABYLON.Mesh, data: any = {}) {
+        this.name = data.name || this.name;
+    }
 
     load(){}
     renderLoop() {}
