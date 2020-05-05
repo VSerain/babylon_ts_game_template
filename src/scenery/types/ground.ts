@@ -12,7 +12,8 @@ export default class Ground {
             BABYLON.PhysicsImpostor.BoxImpostor, 
             { 
                 mass: 0, 
-                restitution: 0.9, 
+                restitution: 0.9,
+                friction: 10,
                 ignoreParent: true 
             }
         );

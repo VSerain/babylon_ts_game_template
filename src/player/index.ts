@@ -20,11 +20,23 @@ export default class PlayerController {
         this.ui = new UI();
     }
 
+    debug() {
+        const cameraDebug = new BABYLON.UniversalCamera("debug-camera", new BABYLON.Vector3(23,9,26), this.scene);
+        cameraDebug.attachControl(this.loader.canvas);
+
+        cameraDebug.keysDown = [83];
+        cameraDebug.keysUp = [90];
+        cameraDebug.keysRight = [68];
+        cameraDebug.keysLeft = [81];
+
+        this.scene.activeCamera = cameraDebug;
+    }
+
     /**
      * Game loop
      */
     renderLoop() {
-        if (!this.camera) return;
+        if (!this.camera || !this.inputManager) return;
         this.scene.render();
         this.inputManager.renderLoop();
     }
@@ -44,7 +56,7 @@ export default class PlayerController {
      * Init input and body to the camera
      */
     initCamera() {
-        this.inputManager = new InputManager(this.scene, this.camera, this.loader.canvas);
         this.body = new PlayerBody(this.camera);
+        this.inputManager = new InputManager(this.scene, this.camera, this.loader.canvas);
     }
 }
