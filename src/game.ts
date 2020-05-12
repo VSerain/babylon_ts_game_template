@@ -27,6 +27,10 @@ export default class Game {
         this.canvas = document.getElementById(this.canvasId) as HTMLCanvasElement;
         if (!this.canvas) throw new Error(`${this.canvasId} is not found in DOM`);
 
+        this.canvas.addEventListener("click", () => {
+            this.canvas.requestPointerLock();
+        });
+
         this.engine = new BABYLON.Engine(this.canvas, ENGINE_CONFIG.ANTIALIAS);
 
         this.loader = new Loader(this.engine, this.canvas);
