@@ -1,7 +1,9 @@
+import * as BABYLON from "babylonjs"
 import eventManager from "app/shared/eventManager";
+import FPSCamera from "../fpsCamera";
 
-export default class FpsInput implements BABYLON.ICameraInput<BABYLON.UniversalCamera> {
-    camera: BABYLON.UniversalCamera;
+export default class FpsInput implements BABYLON.ICameraInput<FPSCamera> {
+    camera: FPSCamera;
 
     directition = {
         up: false,
@@ -10,53 +12,42 @@ export default class FpsInput implements BABYLON.ICameraInput<BABYLON.UniversalC
         right: false,
         jump: false,
     }
-    gravity: number = Math.sqrt(9.81);
-    walkSpeed: number = 10000 / 60 / 60 / 100; // 10km/h in m/ms
-    jumpImpulse: number = 5;
-    inJump:boolean = false;
 
-    lastYPosition: number = 0;
+    maxJumpY: number = 0;
+    lastPositionY: number = 0;
+    lastDirection: BABYLON.Vector3 = BABYLON.Vector3.Zero();
 
     private keys = {
         interactive: [
             69
         ],
         jump: [
-            32,96
+            32,
         ],
         up: [
-            // 90,
+            90,
             38
         ],
         down: [
-            // 83,
+            83,
             40
         ],
         left: [
-            // 81,
+            81,
             37
         ],
         right: [
-            // 68,
+            68,
             39
         ]
     }
 
 
     constructor() {
-        console.log(this.jumpImpulse);
         eventManager.addMultiple(
             "player.input.interactive.on",
             "player.input.interactive.off"
         )
-
-        eventManager.on("onPlayerCollide", {layer: 0}, (cbStop, mesh) => {
-            // todo refacto
-            if (mesh.name === "ground") {
-                console.log("Slaut");
-                this.inJump = false;
-            }
-        });
     }
 
     getClassName() {
@@ -146,28 +137,49 @@ export default class FpsInput implements BABYLON.ICameraInput<BABYLON.UniversalC
         }
     }
 
-    renderLoop() {
-        const body = this.camera.parent as BABYLON.Mesh;
-        if (!body) return;
-
-        const verticalVelocity = body.physicsImpostor?.getLinearVelocity()?.y as number;
-        if (verticalVelocity < -0.1) return;
-        
-        if (this.inJump && body.position.y.toFixed(2) >= this.lastYPosition.toFixed(2)) {
-            this.lastYPosition = body.position.y;
-            return;
+    checkInputs() {
+        let forceUpdate = false;
+        if (this.camera.isInJump) {
+            if (this.camera.position.y > this.maxJumpY) {
+                this.camera.isInJump = false;
+                this.camera.isInFall = true;
+                this.lastPositionY = this.camera.position.y;
+                forceUpdate = true;
+            }
+            else {
+                this.camera.cameraDirection = this.lastDirection.clone();
+                return;
+            }
         }
 
-        if (this.directition.jump) {
-            this.jump();
-            return;
+        if (this.camera.isInFall) {
+            if (this.camera.position.y === this.lastPositionY && !forceUpdate) {
+                this.camera.isInFall = false;
+                this.camera.isOnGround = true;
+                forceUpdate = true;
+            }
+            else {
+                this.lastPositionY = this.camera.position.y;
+                this.camera.cameraDirection = this.lastDirection.subtractFromFloats(0, this.lastDirection.y, 0);
+                return;
+            }
         }
 
-        console.log("move");
+        if (this.directition.jump && !forceUpdate) {
+            this.camera.isInJump = true;
+            this.camera.isOnGround = false;
+            this.maxJumpY = this.camera.position.y + this.camera.jumpHeight;
+        }
+        const directionVector = this.computeDirectionVector();
+        this.lastDirection = directionVector;
+        this.camera.cameraDirection = directionVector.clone();
+    }
 
+    private computeDirectionVector(): BABYLON.Vector3 {
         const cameraVector3d = this.cameraDirectionVector;
         const vector2d = new BABYLON.Vector2(cameraVector3d.x, -cameraVector3d.z).normalize();
         const normal2d = new BABYLON.Vector2(-vector2d.y, vector2d.x);
+        const speed = this.camera._computeLocalCameraSpeed();
 
         let direction2d = new BABYLON.Vector2();
 
@@ -176,37 +188,12 @@ export default class FpsInput implements BABYLON.ICameraInput<BABYLON.UniversalC
         if (this.directition.right) direction2d.addInPlace(normal2d);
         if (this.directition.left) direction2d.subtractInPlace(normal2d);
 
-        direction2d = direction2d.normalize().scale(this.computeSpeed());
-
-        const velocityVector = new BABYLON.Vector3(direction2d.x,0 , -direction2d.y);
-        body.physicsImpostor?.setLinearVelocity(BABYLON.Vector3.Zero());
-        body.physicsImpostor?.setAngularVelocity(BABYLON.Vector3.Zero());
-        body.moveWithCollisions(velocityVector);
-
-        this.inJump = false;
+        direction2d = direction2d.normalize();
+        return new BABYLON.Vector3(direction2d.x, 0, -direction2d.y)
+            .normalize()
+            .scale(speed)
+            .add(new BABYLON.Vector3(0, this.camera.isInJump ? this.camera.speed / 2 : 0, 0).scale(speed));
     }
-
-    jump() {
-        const body = this.camera.parent as BABYLON.Mesh;
-        this.lastYPosition = body.position.y;
-        this.inJump = true;
-
-        let impulseVector = new BABYLON.Vector3(0,this.jumpImpulse,0);
-
-        if (this.directition.up) impulseVector.z -= 0.5;
-        if (this.directition.down) impulseVector.z += 0.5;
-        if (this.directition.right) impulseVector.x -= 0.5;
-        if (this.directition.left) impulseVector.x += 0.5;
-
-        // Apply camera rotation
-        var quaternion = BABYLON.Quaternion.RotationAxis(BABYLON.Axis.Y, this.camera.rotation.y);
-        var matrix = new BABYLON.Matrix();
-        quaternion.toRotationMatrix(matrix);
-        const rotatedImpluseVector = BABYLON.Vector3.TransformCoordinates(impulseVector, matrix);
-
-        body.physicsImpostor?.applyImpulse(rotatedImpluseVector, body.getAbsolutePosition());
-    }
-
 
     private interactiveOn() {
         eventManager.call("player.input.interactive.on")
@@ -217,12 +204,5 @@ export default class FpsInput implements BABYLON.ICameraInput<BABYLON.UniversalC
 
     private get cameraDirectionVector() {
         return BABYLON.Ray.CreateNewFromTo(this.camera.position, this.camera.getTarget()).direction;
-    }
-
-    private computeSpeed() {
-        return this.walkSpeed * this.getDeltaTime();
-    }
-    private getDeltaTime() {
-        return this.camera.getScene().getEngine().getDeltaTime();
     }
 }

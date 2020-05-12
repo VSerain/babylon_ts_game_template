@@ -34,7 +34,7 @@ export default class DefaultButton extends DefaultStructure {
     }
 
     renderLoop() {
-        const distanceToPlayer = BABYLON.Vector3.Distance(this.position, this.playerController.body.position);
+        const distanceToPlayer = BABYLON.Vector3.Distance(this.position, this.playerController.camera.position);
         this.eventActive = distanceToPlayer < MINIMAL_DIST_EVENT;
         if (this.eventActive && !this.animationInPlay) {
             eventManager.call("interactive-object.message.show");

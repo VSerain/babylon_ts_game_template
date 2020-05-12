@@ -12,7 +12,7 @@ export default class ObjectPhysics {
             this.mesh, 
             BABYLON.PhysicsImpostor.BoxImpostor, 
             { 
-                mass: data.mass || 1, 
+                mass: data.mass || 100, 
                 restitution: data.restitution || 0.9, 
                 ignoreParent: true 
             }
