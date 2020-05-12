@@ -5,16 +5,19 @@ import eventManager from "app/shared/eventManager";
 import Loader from "app/loader/index";
 import InputManager from "./inputs/index";
 import PlayerBody from "./playerBody";
+import UI from "./ui/index";
 
 export default class PlayerController {
     scene: BABYLON.Scene;
     camera: BABYLON.UniversalCamera;
     inputManager: InputManager;
     body: PlayerBody;
+    ui: UI;
 
     constructor(private loader: Loader) {
         this.loader.playerController = this;
         this.loader.addPlayerType("player-camera"); 
+        this.ui = new UI();
     }
 
     /**

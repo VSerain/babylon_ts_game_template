@@ -1,0 +1,1 @@
+export const MINIMAL_DIST_EVENT = 6;
