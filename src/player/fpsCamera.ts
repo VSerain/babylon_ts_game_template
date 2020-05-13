@@ -1,12 +1,15 @@
 import * as BABYLON from "babylonjs"
+import * as structureHelpers from "app/shared/structure-helpers";
+
 import eventManager from "app/shared/eventManager";
 import InputManager from "app/player/inputs/index";
-
+import Structure from "app/shared/structure";
 export default class FPSCamera extends BABYLON.UniversalCamera {
     inputManager: InputManager;
     jumpHeight: number = 4;
 
     private _lastY: number = 0;
+    private _lastStructureColide: Structure;
 
     constructor(name: string, position: BABYLON.Vector3, scene: BABYLON.Scene) {
         super(name, position, scene);
@@ -23,7 +26,7 @@ export default class FPSCamera extends BABYLON.UniversalCamera {
     }
 
     private _attachCallback() {
-        eventManager.addMultiple("onPlayerCollide", "onPlayerCollideBottom", "onPlayerCollideTop");
+        eventManager.addMultiple("onPlayerCollide", "onPlayerCollideBottom", "onPlayerCollideTop", "onEveryCollide");
         this.onCollide = (colidedMesh) => this._onColide(colidedMesh);
     }
 
@@ -37,8 +40,19 @@ export default class FPSCamera extends BABYLON.UniversalCamera {
     }
 
     private _onColide(colidedMesh: BABYLON.AbstractMesh) {
-        console.log(colidedMesh.metadata.instance);
-        eventManager.call("onPlayerCollide", [colidedMesh]);
+        const structure = structureHelpers.getStructureByMesh(colidedMesh);
+        if (!structure || structure === this._lastStructureColide) return;
+        this._lastStructureColide = structure;
+        eventManager.call("onEveryCollide", [structure]);
+        if (structure.absolutePosition.y < this.position.y) {
+            eventManager.call("onPlayerCollideBottom", [structure]);
+        }
+        else if (structure.absolutePosition.y >= this.position.y + this.ellipsoid.y) {
+            eventManager.call("onPlayerCollideTop", [structure]);
+        }
+        else {
+            eventManager.call("onPlayerCollide", [structure]);
+        }
     }
 
 

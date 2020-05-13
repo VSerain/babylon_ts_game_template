@@ -34,6 +34,10 @@ export default class Structure {
         this.mesh.position = position;
     }
 
+    get absolutePosition() {
+        return this.mesh.getAbsolutePosition();
+    }
+
     get rotation() {
         return this.mesh.rotation;
     }
