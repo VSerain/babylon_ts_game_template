@@ -18,18 +18,6 @@ export default class PlayerController {
         this.ui = new UI();
     }
 
-    debug() {
-        const cameraDebug = new BABYLON.UniversalCamera("debug-camera", new BABYLON.Vector3(23,9,26), this.scene);
-        cameraDebug.attachControl(this.loader.canvas);
-
-        cameraDebug.keysDown = [83];
-        cameraDebug.keysUp = [90];
-        cameraDebug.keysRight = [68];
-        cameraDebug.keysLeft = [81];
-
-        this.scene.activeCamera = cameraDebug;
-    }
-
     /**
      * Game loop
      */

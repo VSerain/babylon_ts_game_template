@@ -1,6 +1,6 @@
 import * as BABYLON from "babylonjs"
 import eventManager from "app/shared/eventManager";
-import FPSCamera from "../fpsCamera";
+import FPSCamera from "app/player/fpsCamera";
 
 export default class FpsInput implements BABYLON.ICameraInput<FPSCamera> {
     camera: FPSCamera;
@@ -17,7 +17,7 @@ export default class FpsInput implements BABYLON.ICameraInput<FPSCamera> {
     lastPositionY: number = 0;
     lastDirection: BABYLON.Vector3 = BABYLON.Vector3.Zero();
 
-    private keys = {
+    private keys = { // TODO Parametrable keys
         interactive: [
             69
         ],
@@ -141,8 +141,7 @@ export default class FpsInput implements BABYLON.ICameraInput<FPSCamera> {
         let forceUpdate = false;
         if (this.camera.isInJump) {
             if (this.camera.position.y > this.maxJumpY) {
-                this.camera.isInJump = false;
-                this.camera.isInFall = true;
+                this.camera.fall();
                 this.lastPositionY = this.camera.position.y;
                 forceUpdate = true;
             }
@@ -154,8 +153,7 @@ export default class FpsInput implements BABYLON.ICameraInput<FPSCamera> {
 
         if (this.camera.isInFall) {
             if (this.camera.position.y === this.lastPositionY && !forceUpdate) {
-                this.camera.isInFall = false;
-                this.camera.isOnGround = true;
+                this.camera.ground();
                 forceUpdate = true;
             }
             else {
@@ -166,8 +164,7 @@ export default class FpsInput implements BABYLON.ICameraInput<FPSCamera> {
         }
 
         if (this.directition.jump && !forceUpdate) {
-            this.camera.isInJump = true;
-            this.camera.isOnGround = false;
+            this.camera.jump();
             this.maxJumpY = this.camera.position.y + this.camera.jumpHeight;
         }
         const directionVector = this.computeDirectionVector();

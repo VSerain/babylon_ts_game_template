@@ -1,14 +1,17 @@
 import * as BABYLON from "babylonjs";
 
-import { ENGINE_CONFIG } from "./config";
+import { ENGINE_CONFIG } from "app/config";
 
-import Loader from "./loader/index";
-import PlayerController from "./player/index";
-import SceneryController from "./scenery/index";
-import ObjectsController from "./objects/index";
-import EntitiesController from "./entities/index";
+import Loader from "app/loader/index";
+import PlayerController from "app/player/index";
+import SceneryController from "app/scenery/index";
+import ObjectsController from "app/objects/index";
+import EntitiesController from "app/entities/index";
+import eventManager from "app/shared/eventManager";
 
 export default class Game {
+
+    private isFullLoad: boolean = false;
 
     private canvas: HTMLCanvasElement;
     private engine: BABYLON.Engine;
@@ -31,6 +34,8 @@ export default class Game {
             this.canvas.requestPointerLock();
         });
 
+        this,this.attachCallback();
+
         this.engine = new BABYLON.Engine(this.canvas, ENGINE_CONFIG.ANTIALIAS);
 
         this.loader = new Loader(this.engine, this.canvas);
@@ -52,4 +57,25 @@ export default class Game {
             this.engine.resize();
         });
     }
+
+    attachCallback() {
+        eventManager.on("loader.sceneLoaded", {}, () => this.isFullLoad = true);
+    }
+
+    debugCamera() {
+        if (!this.isFullLoad) return;
+        const scene = this.loader.scene;
+        const cameraDebug = new BABYLON.UniversalCamera("debug-camera", new BABYLON.Vector3(23,9,26), scene);
+        cameraDebug.attachControl(this.loader.canvas);
+
+        cameraDebug.angularSensibility = 4000;
+
+        cameraDebug.keysDown = [83];
+        cameraDebug.keysUp = [90];
+        cameraDebug.keysRight = [68];
+        cameraDebug.keysLeft = [81];
+
+        scene.activeCamera = cameraDebug;
+    }
+
 }
