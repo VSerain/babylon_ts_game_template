@@ -9,6 +9,7 @@ import Ground from "./types/ground";
 export default class SceneryController {
     _scene: BABYLON.Scene;
 
+    load: boolean = false;
     sceneObjects: Array<any> = [];
 
     constructor(private loader: Loader) {
@@ -16,7 +17,8 @@ export default class SceneryController {
 
         this.initType();
 
-        eventManager.on("loader.sceneLoaded", { layer: 0}, () => {
+        eventManager.on("loader.sceneLoaded", { layer: 0 }, () => {
+            this.load = true;
             if (this.sceneObjects.find(object => object instanceof Ground)) return;
 
             const ground = BABYLON.GroundBuilder.CreateGround("ground", { width: 100, height: 100}, this.scene);
@@ -28,7 +30,10 @@ export default class SceneryController {
     /**
      * Game loop
      */
-    renderLoop() {}
+    renderLoop() {
+        if (!this.scene || !this.load) return;
+        this.scene.render();
+    }
 
     get scene() {
         return this._scene;
@@ -42,7 +47,7 @@ export default class SceneryController {
      * Initailize the scene 
      */
     initScene() {
-        this.scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
+        this.scene.gravity = new BABYLON.Vector3(0, -0.4, 0);
         this.scene.enablePhysics(this.scene.gravity);
         this.scene.collisionsEnabled = true;
     }
