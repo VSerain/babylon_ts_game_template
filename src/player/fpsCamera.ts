@@ -37,6 +37,7 @@ export default class FPSCamera extends BABYLON.UniversalCamera {
     }
 
     private _onColide(colidedMesh: BABYLON.AbstractMesh) {
+        console.log(colidedMesh.metadata.instance);
         eventManager.call("onPlayerCollide", [colidedMesh]);
     }
 

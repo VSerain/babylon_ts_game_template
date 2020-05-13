@@ -1,5 +1,7 @@
 import * as BABYLON from "babylonjs";
 import eventManager from "app/shared/eventManager";
+import Structure from "app/shared/structure";
+import * as structureHelpers from "app/shared/structure-helpers";
 
 import Loader from "app/loader/index";
 
@@ -67,11 +69,15 @@ export default class SceneryController {
     addMesh(typeName: string, mesh: BABYLON.AbstractMesh, data?: any) {
         const type = Types.find((type) => type.name == typeName);
         if (!type) return;
-        const instance = new type.default(mesh as any, data);
 
         if (!mesh.metadata) mesh.metadata = {};
 
-        mesh.metadata.instance = instance;
+        const instance = new type.default(mesh as BABYLON.Mesh, data) as Structure;
+
+        structureHelpers.applyController(instance, this.loader);
+
         this.sceneObjects.push(instance);
+
+        instance.load();
     }
 }

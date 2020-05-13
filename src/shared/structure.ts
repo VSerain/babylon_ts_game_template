@@ -4,8 +4,7 @@ import ObjectsController from "app/objects/index";
 import EntitiesController from "app/entities/index";
 import SceneryController from "app/scenery/index";
 
-
-export default class DefaultStructure {
+export default class Structure {
     require = {
         playerController: false,
         objectsController: false,
@@ -17,6 +16,7 @@ export default class DefaultStructure {
 
     constructor(protected mesh: BABYLON.Mesh, data: any = {}) {
         this.name = data.name || this.name;
+        this.mesh.metadata.instance = this;
     }
 
     load(){}

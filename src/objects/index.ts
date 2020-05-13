@@ -1,10 +1,11 @@
 import * as BABYLON from "babylonjs"
 import eventManager from "app/shared/eventManager";
+import Structure from "app/shared/structure";
+import * as structureHelpers from "app/shared/structure-helpers";
 
 import Loader from "app/loader/index";
 
 import Buttons from "./buttons/index"
-import DefaultStructure from "./defaultStructure";
 
 export default class ObjectsController {
     scene: BABYLON.Scene;
@@ -15,7 +16,7 @@ export default class ObjectsController {
 
     types: Array<any> = [];
 
-    interactiveObjects: Array<DefaultStructure> = [];
+    interactiveObjects: Array<Structure> = [];
 
     constructor(private loader: Loader) {
         this.loader.objectsController = this;
@@ -48,25 +49,12 @@ export default class ObjectsController {
     addMesh(typeName: string, mesh: BABYLON.AbstractMesh, data?: any) {
         const type = this.types.find((type) => type.name == typeName);
         if (!type) return;
-        
-        const instance = new type.default(mesh, data) as DefaultStructure;
-
-        if (instance.require.playerController) {
-            instance.playerController = this.loader.playerController;
-        }
-        if (instance.require.objectsController) {
-            instance.objectsController = this.loader.objectsController;
-        }
-        if (instance.require.entitiesController) {
-            instance.entitiesController = this.loader.entitiesController;
-        }
-        if (instance.require.sceneryController) {
-            instance.sceneryController = this.loader.sceneryController;
-        }
 
         if (!mesh.metadata) mesh.metadata = {};
+        
+        const instance = new type.default(mesh, data) as Structure;
 
-        mesh.metadata.instance = instance;
+        structureHelpers.applyController(instance, this.loader);
 
         this.interactiveObjects.push(instance);
         instance.load();
