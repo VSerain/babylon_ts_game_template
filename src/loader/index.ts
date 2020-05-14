@@ -7,13 +7,17 @@ import EntitiesController from "app/entities/index";
 
 import eventManager from "app/shared/eventManager";
 
-import { TypesLoader } from "./interfaces";
+import { IMPORT_GLB } from "app/config";
+
+import { TypesLoader, ContainerQueue, ContainerQueueItem } from "./interfaces";
 
 /**
  * The Loader class is used for load the scene 
  */
 export default class Loader {
     private typesLoader: TypesLoader = {};
+    private importContainerQueue: ContainerQueue = [];
+
     public scene: BABYLON.Scene;
 
     public playerController: PlayerController;
@@ -22,7 +26,7 @@ export default class Loader {
     public entitiesController: EntitiesController;
 
     constructor(private engine: BABYLON.Engine, public canvas: HTMLCanvasElement) {
-        eventManager.add("loader.sceneLoaded");
+        eventManager.addMultiple("loader.sceneLoaded", "loader.beforeImportMap");
     }
 
     /**
@@ -107,8 +111,9 @@ export default class Loader {
         this.entitiesController.scene = this.scene;
 
         // this.__dev__spawnButton();
+        eventManager.call("loader.beforeImportMap");
 
-        BABYLON.SceneLoader.Append("assets/glb/", "test3.glb", this.scene, () => {
+        BABYLON.SceneLoader.Append(IMPORT_GLB.FOLDER_PATH, IMPORT_GLB.MAP_FILE_NAME, this.scene, () => {
             this.scene.meshes.forEach(mesh => {
 
                 if (mesh.metadata && mesh.metadata.instance) return;
@@ -124,7 +129,42 @@ export default class Loader {
                 this.loadMesh(type, mesh, data);
             });
 
-            eventManager.call("loader.sceneLoaded", []);
+            this._loadAllContainerQueue().then( () => {
+                eventManager.call("loader.sceneLoaded");
+            });
+        });
+    }
+
+    loadAssetsContainer(assetsFileName: string): Promise<BABYLON.AssetContainer> {
+        return new Promise((resolve) => this._addToContainerQueue(assetsFileName, resolve));
+    }
+
+    private _loadAllContainerQueue(): Promise<any> {
+        return Promise.all(
+            this.importContainerQueue.map(
+                item => new Promise(resolve => this._loadAssetsContainer(item, resolve))));
+    }
+
+    private _addToContainerQueue(assetsFileName: string, resolver: () => void) {
+        const containerQueueItem = {
+            file: assetsFileName,
+            resolver
+        } as ContainerQueueItem;
+
+        if (!this.scene)  {
+            this.importContainerQueue.push(containerQueueItem);
+        }
+        else {
+            this._loadAssetsContainer(containerQueueItem, () => {});
+        }
+    }
+
+    private _loadAssetsContainer(containerQueueItem: ContainerQueueItem, next: () => void) {
+        const index = this.importContainerQueue.findIndex(item => item === containerQueueItem);
+        if (index) this.importContainerQueue.splice(index, 1);
+        BABYLON.SceneLoader.LoadAssetContainer(IMPORT_GLB.FOLDER_PATH, containerQueueItem.file, this.scene, (container) => {
+            containerQueueItem.resolver(container)
+            next();
         });
     }
 
