@@ -25,3 +25,8 @@ export function getStructureByMesh(mesh: BABYLON.AbstractMesh): Structure | null
 
     return null;
 }
+
+export interface StructureConstructor {
+    new(mesh: BABYLON.Mesh, data: any): Structure;
+    (): Structure;
+}

@@ -4,6 +4,7 @@ import * as structureHelpers from "app/shared/structure-helpers";
 import eventManager from "app/shared/eventManager";
 import InputManager from "app/player/inputs/index";
 import Structure from "app/shared/structure";
+
 export default class FPSCamera extends BABYLON.UniversalCamera {
     inputManager: InputManager;
     jumpHeight: number = 4;
@@ -26,8 +27,8 @@ export default class FPSCamera extends BABYLON.UniversalCamera {
     }
 
     private _attachCallback() {
-        eventManager.addMultiple("onPlayerCollide", "onPlayerCollideBottom", "onPlayerCollideTop", "onEveryCollide");
-        this.onCollide = (colidedMesh) => this._onColide(colidedMesh);
+        eventManager.addMultiple("onPlayerCollide", "onPlayerCollideBottom", "onPlayerCollideTop", "onPlayerEveryCollide");
+        this.onCollide = (collidedMesh) => this._onCollide(collidedMesh);
     }
 
     private _enabledPhysics() {
@@ -39,11 +40,11 @@ export default class FPSCamera extends BABYLON.UniversalCamera {
         self._needMoveForGravity = true;
     }
 
-    private _onColide(colidedMesh: BABYLON.AbstractMesh) {
-        const structure = structureHelpers.getStructureByMesh(colidedMesh);
+    private _onCollide(collidedMesh: BABYLON.AbstractMesh) {
+        const structure = structureHelpers.getStructureByMesh(collidedMesh);
         if (!structure || structure === this._lastStructureColide) return;
         this._lastStructureColide = structure;
-        eventManager.call("onEveryCollide", [structure]);
+        eventManager.call("onPlayerEveryCollide", [structure]);
         if (structure.absolutePosition.y < this.position.y) {
             eventManager.call("onPlayerCollideBottom", [structure]);
         }
