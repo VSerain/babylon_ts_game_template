@@ -10,7 +10,7 @@ export default class FPSCamera extends BABYLON.UniversalCamera {
     jumpHeight: number = 4;
 
     private _lastY: number = 0;
-    private _lastStructureColide: Structure;
+    private _lastStructureCollide: Structure;
 
     constructor(name: string, position: BABYLON.Vector3, scene: BABYLON.Scene) {
         super(name, position, scene);
@@ -42,8 +42,8 @@ export default class FPSCamera extends BABYLON.UniversalCamera {
 
     private _onCollide(collidedMesh: BABYLON.AbstractMesh) {
         const structure = structureHelpers.getStructureByMesh(collidedMesh);
-        if (!structure || structure === this._lastStructureColide) return;
-        this._lastStructureColide = structure;
+        if (!structure || structure === this._lastStructureCollide) return;
+        this._lastStructureCollide = structure;
         eventManager.call("onPlayerEveryCollide", [structure]);
         if (structure.absolutePosition.y < this.position.y) {
             eventManager.call("onPlayerCollideBottom", [structure]);
