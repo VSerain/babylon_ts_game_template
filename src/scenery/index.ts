@@ -1,13 +1,22 @@
 import * as BABYLON from "babylonjs";
 import eventManager from "app/shared/eventManager";
+import Structure from "app/shared/structure";
+import { applyController, StructureConstructor} from "app/shared/structure-helpers";
 
 import Loader from "app/loader/index";
 
 import Types from "./types/index";
 import Ground from "./types/ground";
 
+interface Type {
+    name: string,
+    class: StructureConstructor
+}
+
 export default class SceneryController {
     _scene: BABYLON.Scene;
+
+    private _types: Array<Type> = [];
 
     load: boolean = false;
     sceneObjects: Array<any> = [];
@@ -56,22 +65,39 @@ export default class SceneryController {
      * Add scenery type to the loader
      */
     initType() {
-        Types.forEach(type => {
-            this.loader.addSceneryType(type.name);
+        
+        this._types.push({
+            name: "default",
+            class: Structure as StructureConstructor
         });
+        Types.forEach((type: any) => {
+            this._types.push({
+                name: type.name as string,
+                class: type.default as StructureConstructor
+            })
+        });
+
+        this._types.forEach(type => {
+            this.loader.addSceneryType(type.name);
+        })
+
     }
 
     /**
      * Is call by the loader when mesh added is corresponding to the player type
      */
     addMesh(typeName: string, mesh: BABYLON.AbstractMesh, data?: any) {
-        const type = Types.find((type) => type.name == typeName);
+        const type = this._types.find((type) => type.name == typeName);
         if (!type) return;
-        const instance = new type.default(mesh as any, data);
 
         if (!mesh.metadata) mesh.metadata = {};
 
-        mesh.metadata.instance = instance;
+        const instance = new type.class(mesh as BABYLON.Mesh, data);
+
+        applyController(instance, this.loader);
+
         this.sceneObjects.push(instance);
+
+        instance.load();
     }
 }

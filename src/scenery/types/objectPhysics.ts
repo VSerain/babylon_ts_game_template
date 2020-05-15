@@ -1,3 +1,5 @@
+import * as BABYLON from "babylonjs";
+import Structure from "app/shared/structure";
 
 export const name = "object-physics";
 
@@ -6,8 +8,9 @@ export const name = "object-physics";
  * 
  * if data have mass or restitution params, their is apply to the physics impositor
  */
-export default class ObjectPhysics {
-    constructor(private mesh: BABYLON.AbstractMesh, data: any = {}) {
+export default class ObjectPhysics extends Structure {
+    constructor(protected mesh: BABYLON.Mesh, data: any = {}) {
+        super(mesh, data);
         this.mesh.physicsImpostor = new BABYLON.PhysicsImpostor(
             this.mesh, 
             BABYLON.PhysicsImpostor.BoxImpostor, 

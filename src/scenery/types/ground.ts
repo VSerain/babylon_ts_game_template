@@ -1,12 +1,14 @@
 import * as BABYLON from "babylonjs";
+import Structure from "app/shared/structure";
 
 export const name = "ground";
 
 /**
  * When mesh have type ground we spwan a new Ground and we add collisons and body
  */
-export default class Ground {
-    constructor(private mesh: BABYLON.AbstractMesh, data?: any) {
+export default class Ground extends Structure {
+    constructor(protected mesh: BABYLON.Mesh, data?: any) {
+        super(mesh, data);
         this.mesh.physicsImpostor = new BABYLON.PhysicsImpostor(
             this.mesh, 
             BABYLON.PhysicsImpostor.BoxImpostor, 

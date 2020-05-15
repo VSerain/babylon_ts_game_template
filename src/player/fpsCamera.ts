@@ -1,12 +1,16 @@
 import * as BABYLON from "babylonjs"
+import * as structureHelpers from "app/shared/structure-helpers";
+
 import eventManager from "app/shared/eventManager";
 import InputManager from "app/player/inputs/index";
+import Structure from "app/shared/structure";
 
 export default class FPSCamera extends BABYLON.UniversalCamera {
     inputManager: InputManager;
     jumpHeight: number = 4;
 
     private _lastY: number = 0;
+    private _lastStructureCollide: Structure;
 
     constructor(name: string, position: BABYLON.Vector3, scene: BABYLON.Scene) {
         super(name, position, scene);
@@ -23,8 +27,8 @@ export default class FPSCamera extends BABYLON.UniversalCamera {
     }
 
     private _attachCallback() {
-        eventManager.addMultiple("onPlayerCollide", "onPlayerCollideBottom", "onPlayerCollideTop");
-        this.onCollide = (colidedMesh) => this._onColide(colidedMesh);
+        eventManager.addMultiple("onPlayerCollide", "onPlayerCollideBottom", "onPlayerCollideTop", "onPlayerEveryCollide");
+        this.onCollide = (collidedMesh) => this._onCollide(collidedMesh);
     }
 
     private _enabledPhysics() {
@@ -36,8 +40,20 @@ export default class FPSCamera extends BABYLON.UniversalCamera {
         self._needMoveForGravity = true;
     }
 
-    private _onColide(colidedMesh: BABYLON.AbstractMesh) {
-        eventManager.call("onPlayerCollide", [colidedMesh]);
+    private _onCollide(collidedMesh: BABYLON.AbstractMesh) {
+        const structure = structureHelpers.getStructureByMesh(collidedMesh);
+        if (!structure || structure === this._lastStructureCollide) return;
+        this._lastStructureCollide = structure;
+        eventManager.call("onPlayerEveryCollide", [structure]);
+        if (structure.absolutePosition.y < this.position.y) {
+            eventManager.call("onPlayerCollideBottom", [structure]);
+        }
+        else if (structure.absolutePosition.y >= this.position.y + this.ellipsoid.y) {
+            eventManager.call("onPlayerCollideTop", [structure]);
+        }
+        else {
+            eventManager.call("onPlayerCollide", [structure]);
+        }
     }
 
 

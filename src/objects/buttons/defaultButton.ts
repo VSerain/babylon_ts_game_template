@@ -1,13 +1,13 @@
 import * as BABYLON from "babylonjs";
 
-import DefaultStructure from "../defaultStructure";
+import Structure from "app/shared/structure";
 
 import { MINIMAL_DIST_EVENT } from "app/objects/constants";
 import eventManager from "app/shared/eventManager";
 
 export const name = "default-button"
 
-export default class DefaultButton extends DefaultStructure {
+export default class DefaultButton extends Structure {
     eventActive: boolean = false;
     animationInPlay: boolean = false;
 
