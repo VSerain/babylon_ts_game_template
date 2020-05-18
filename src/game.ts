@@ -31,10 +31,10 @@ export default class Game {
         if (!this.canvas) throw new Error(`${this.canvasId} is not found in DOM`);
 
         this.canvas.addEventListener("click", () => {
-            this.canvas.requestPointerLock();
+            this.canvas.requestPointerLock(); // Lock pointer to game
         });
 
-        this,this.attachCallback();
+        this.attachCallback();
 
         this.engine = new BABYLON.Engine(this.canvas, ENGINE_CONFIG.ANTIALIAS);
 

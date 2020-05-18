@@ -14,9 +14,7 @@ export default class EntitiesController {
         this.store.addAssets("default-weapon", "weapon.glb");
 
         eventManager.on("loader.sceneLoaded", {}, () => {
-            setTimeout(() => {
-                this.devSpawnWeapon();
-            }, 2000);
+            // this.devSpawnWeapon();
         });
     }
 
@@ -27,11 +25,13 @@ export default class EntitiesController {
     }
 
     devSpawnWeapon() {
-        const entries = this.store.getEntries("default-weapon");
-        entries.rootNodes[0].position.x += 3;
-        entries.rootNodes[0].position.z += 3;
-        entries.rootNodes[0].position.y = 1.75;
+        setTimeout(() => {
+            const entries = this.store.getEntries("default-weapon");
+            entries.rootNodes[0].position.x += 3;
+            entries.rootNodes[0].position.z += 3;
+            entries.rootNodes[0].position.y = 1.75;
 
-        entries.rootNodes[0].scaling = new BABYLON.Vector3(0.2,0.2,0.2);
+            entries.rootNodes[0].scaling = new BABYLON.Vector3(0.2,0.2,0.2);
+        }, 2000);
     }
 }

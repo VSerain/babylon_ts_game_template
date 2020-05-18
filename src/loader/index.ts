@@ -17,6 +17,7 @@ import { TypesLoader, ContainerQueue, ContainerQueueItem } from "./interfaces";
 export default class Loader {
     private typesLoader: TypesLoader = {};
     private importContainerQueue: ContainerQueue = [];
+    private mapLoaded: boolean = false;
 
     public scene: BABYLON.Scene;
 
@@ -130,6 +131,7 @@ export default class Loader {
             });
 
             this._loadAllContainerQueue().then( () => {
+                this.mapLoaded = true;
                 eventManager.call("loader.sceneLoaded");
             });
         });
@@ -151,7 +153,7 @@ export default class Loader {
             resolver
         } as ContainerQueueItem;
 
-        if (!this.scene)  {
+        if (!this.mapLoaded)  {
             this.importContainerQueue.push(containerQueueItem);
         }
         else {

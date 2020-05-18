@@ -1,16 +1,7 @@
 import * as BABYLON from "babylonjs";
 import Loader from "app/loader/index";
 
-interface StoredItem {
-    name: string,
-    loaded: boolean,
-    container?: BABYLON.AssetContainer
-}
-
-export interface StoreList {
-    [index: string]: StoredItem
-}
-
+import { StoreList } from "./interfaces";
 
 export default class Store {
     private storedContainer : StoreList = {};
