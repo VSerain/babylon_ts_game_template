@@ -16,6 +16,7 @@ export default class Structure {
 
     constructor(protected mesh: BABYLON.Mesh, data: any = {}) {
         this.name = data.name || this.name;
+        if (!this.mesh.metadata) this.mesh.metadata = {};
         this.mesh.metadata.instance = this;
     }
 
