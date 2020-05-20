@@ -13,7 +13,7 @@ export default class DefaultWeapon extends Structure {
     entries: BABYLON.InstantiatedEntries;
     node: BABYLON.TransformNode;
     inFireAnimation: boolean = false;
-    annimations: Array<any> = [];
+    animations: Array<any> = [];
 
     constructor() {
         super(new BABYLON.Mesh("tmpMesh"), {});
@@ -79,49 +79,49 @@ export default class DefaultWeapon extends Structure {
     }
 
     async startAnimation(animationName: String): Promise<boolean> {
-        const animation = this.annimations.find(animationData => animationData.name === animationName);
-        if (!animation) return false;
-        const animatable = this.sceneryController.scene.beginAnimation(this.node, animation.start, animation.end, animation.loop, animation.speed);
-    
+        const animationData = this.animations.find(animationData => animationData.name === animationName);
+        if (!animationData) return false;
+        const animatable = this.sceneryController.scene.beginDirectAnimation(this.node, [animationData.animation] , animationData.start, animationData.end, animationData.loop, animationData.speed);
         await animatable.waitAsync();
         return true;
     }
 
     computeAnimation(node: BABYLON.TransformNode) {
+        node.animations = [];
         const walkAnimation = new BABYLON.Animation("walk", "position.y", 4, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
         const walkKey = []; 
 
         walkKey.push(
             {
-                frame: 0,
+                frame: 20,
                 value: node.position.y
             },
             {
-                frame: 1,
+                frame: 21,
                 value: node.position.y + 0.008
             },
             {
-                frame: 2,
+                frame: 22,
                 value: node.position.y + 0.02
             },
             {
-                frame: 3,
+                frame: 23,
                 value: node.position.y
             }
         );
         walkAnimation.setKeys(walkKey);
         node.animations.push(walkAnimation);
         
-        this.annimations.push({
+        this.animations.push({
             name: "walk",
-            start: 0,
-            end: 3,
+            start: 20,
+            end: 23,
             loop: true,
             speed: 1,
             animation: walkAnimation
         });
 
-        const fireAnimation = new BABYLON.Animation("fire", "rotation.z", 3, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+        const fireAnimation = new BABYLON.Animation("fire", "rotation.z", 3, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
         const fireKey = []; 
 
         fireKey.push(
@@ -141,7 +141,7 @@ export default class DefaultWeapon extends Structure {
         fireAnimation.setKeys(fireKey);
         node.animations.push(fireAnimation);
         
-        this.annimations.push({
+        this.animations.push({
             name: "fire",
             start: 10,
             end: 12,
