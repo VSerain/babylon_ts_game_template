@@ -27,7 +27,13 @@ export default class FPSCamera extends BABYLON.UniversalCamera {
     }
 
     private _attachCallback() {
-        eventManager.addMultiple("onPlayerCollide", "onPlayerCollideBottom", "onPlayerCollideTop", "onPlayerEveryCollide");
+        eventManager.addMultiple(
+            "onPlayerCollide",
+            "onPlayerCollideBottom",
+            "onPlayerCollideTop",
+            "onPlayerEveryCollide",
+            "player.move.status.changed"
+        );
         this.onCollide = (collidedMesh) => this._onCollide(collidedMesh);
     }
 
@@ -94,4 +100,29 @@ export default class FPSCamera extends BABYLON.UniversalCamera {
         this.isOnGround = true;
         this.isInFall = false;
     }
+
+    /**
+     * -------------
+     * | Move Part |
+     * -------------
+     */
+
+    isStatic: boolean = true;
+    isInWalk: boolean = false;
+
+    switchToStatic() {
+        if (this.isStatic) return;
+        this.isInWalk = false;
+        this.isStatic = true;
+        eventManager.call("player.move.status.changed", ["static"]);
+    }
+
+    switchToWalk() {
+        if (this.isInWalk) return;
+        this.isInWalk = true;
+        this.isStatic = false;
+        eventManager.call("player.move.status.changed", ["walk"]);
+
+    }
+
 }
