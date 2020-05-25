@@ -1,12 +1,15 @@
 import * as BABYLON from "babylonjs"
 import * as structureHelpers from "app/shared/structure-helpers";
 
-import eventManager from "app/shared/eventManager";
 import InputManager from "app/player/inputs/index";
+import Body from "app/player/body";
+
+import eventManager from "app/shared/eventManager";
 import Structure from "app/shared/structure";
 
 export default class FPSCamera extends BABYLON.UniversalCamera {
     inputManager: InputManager;
+    body: Body;
     jumpHeight: number = 4;
 
     private _lastY: number = 0;
@@ -18,9 +21,11 @@ export default class FPSCamera extends BABYLON.UniversalCamera {
         this.speed = 5;
         this.angularSensibility = 5000; // TODO Make paramtrable by player
         this.ellipsoid = new BABYLON.Vector3(1, 1.75,1);
+        this.ellipsoidOffset.y = this.ellipsoid.y;
         this.setTarget(new BABYLON.Vector3(-0.8, -0.12, 0.83));
         this.rotation = new BABYLON.Vector3(0, -2 ,0);
         this.inputManager = new InputManager(this);
+        this.body = new Body(this, scene);
         
         this._enabledPhysics();
         this._attachCallback();
@@ -122,7 +127,6 @@ export default class FPSCamera extends BABYLON.UniversalCamera {
         this.isInWalk = true;
         this.isStatic = false;
         eventManager.call("player.move.status.changed", ["walk"]);
-
     }
 
 }
