@@ -24,6 +24,7 @@ export default class WeaponSpawner extends Structure {
         this.weaponName = data.weapon;
         this.require.entitiesController = true;
         this.require.playerController = true;
+        this.require.sceneryController = true;
     }
 
     load() {
@@ -49,8 +50,22 @@ export default class WeaponSpawner extends Structure {
         this.representationNode = entries.rootNodes[0];
         this.representationNode.parent = this.mesh;
         this.representationNode.position = new BABYLON.Vector3(0, 1, 0);
+        this.representationNode.rotation = new BABYLON.Vector3(0, Math.PI, 0);
+        this.representationNode.scaling = new BABYLON.Vector3(0.2,0.2,0.2); // @TODO: Remove me
 
-        entries.rootNodes[0].scaling = new BABYLON.Vector3(0.2,0.2,0.2); // @TODO: Remove me
+        const animation = new BABYLON.Animation("rotate0", "rotation.y", 1, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+        animation.setKeys([
+            {
+                frame: 0,
+                value: this.representationNode.rotation.y
+            },
+            {
+                frame: 20,
+                value: this.representationNode.rotation.y - Math.PI * 2
+            }
+        ]);
+        this.representationNode.animations.push(animation);
+        this.sceneryController.scene.beginDirectAnimation(this.representationNode, [animation] , 0, 20, true);
     }
 
 }
