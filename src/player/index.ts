@@ -9,7 +9,7 @@ import eventManager from "app/shared/eventManager";
 
 export default class PlayerController {
     scene: BABYLON.Scene;
-    camera: BABYLON.UniversalCamera;
+    camera: FPSCamera;
     canvas: HTMLCanvasElement;
     ui: UI;
 

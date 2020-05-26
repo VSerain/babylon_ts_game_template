@@ -55,13 +55,13 @@ export default class DefaultWeapon extends Structure {
         this.isAttached = true;
         this.entries = this.entitiesController.store.getEntries(name);
         this.node = this.entries.rootNodes[0];
-        this.node.parent = this.playerController.camera;
-        this.node.position = new BABYLON.Vector3(0.7, -0.9 ,2.5);
-        this.node.rotation = new BABYLON.Vector3(0, Math.PI / 2,0);
+        this.node.parent = this.playerController.camera.body.handRight;
+        
+        this.node.position = new BABYLON.Vector3(0, -0.6 , -0.1);
+        this.node.rotation = new BABYLON.Vector3(0, Math.PI / 2,  Math.PI / 2);
         
         // @TODO remove me
-        this.node.scaling = new BABYLON.Vector3(0.2,0.2,0.2);
-
+        this.node.scaling = new BABYLON.Vector3(0.08,0.08,0.08);
         this.computeAnimation(this.node);
     }
 
@@ -98,11 +98,11 @@ export default class DefaultWeapon extends Structure {
             },
             {
                 frame: 21,
-                value: node.position.y + 0.008
+                value: node.position.y + 0.004
             },
             {
                 frame: 22,
-                value: node.position.y + 0.02
+                value: node.position.y + 0.008
             },
             {
                 frame: 23,
@@ -131,7 +131,7 @@ export default class DefaultWeapon extends Structure {
             },
             {
                 frame: 11,
-                value: node.rotation.z - Math.PI / 8
+                value: node.rotation.z - Math.PI / 12
             },
             {
                 frame: 12,

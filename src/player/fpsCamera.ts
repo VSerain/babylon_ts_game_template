@@ -20,6 +20,7 @@ export default class FPSCamera extends BABYLON.UniversalCamera {
   
         this.speed = 5;
         this.angularSensibility = 5000; // TODO Make paramtrable by player
+        this.minZ = 0.4;
         this.ellipsoid = new BABYLON.Vector3(1, 1.75,1);
         this.ellipsoidOffset.y = this.ellipsoid.y;
         this.setTarget(new BABYLON.Vector3(-0.8, -0.12, 0.83));

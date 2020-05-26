@@ -1,4 +1,5 @@
 import * as BABYLON from "babylonjs";
+import eventManager from "app/shared/eventManager";
 
 import FPSCamera from "./fpsCamera";
 
@@ -10,11 +11,20 @@ export default class Body {
     legLeft: BABYLON.Mesh;
     legRight: BABYLON.Mesh;
 
+    defaultWeaponHandRotation: BABYLON.Vector3 = new BABYLON.Vector3(-Math.PI / 2, 0,0);
+
     constructor(private camera: FPSCamera, private scene: BABYLON.Scene) {
         this._createHead();
         this._createHands();
         this._createBody();
         this._createLegs();
+
+        eventManager.on("player.activeWeapon", { layer: Infinity}, (cbStop, weapon) => {
+            this._handUpAnimation();
+        });
+        eventManager.on("player.unactiveWeapon", {}, (cbStop, weapon) => {
+            this.handRight.rotation = new BABYLON.Vector3();
+        });
     }
 
     private _createHead() {
@@ -29,15 +39,16 @@ export default class Body {
     private _createHands() {
         this.handLeft = BABYLON.BoxBuilder.CreateBox("player.hand-left", { width: 0.1, depth: 0.1, height: 0.8 } , this.scene);
         this.handLeft.parent = this.camera;
+        this.handLeft.setPivotPoint(new BABYLON.Vector3(0, 0.38, 0)); // set pivotPoint with shoulder
         this.handLeft.material = this._getDebugMaterial();
 
         this.handRight = BABYLON.BoxBuilder.CreateBox("player.hand-Right", { width: 0.1, depth: 0.1, height: 0.8 } , this.scene);
         this.handRight.parent = this.camera;
+        this.handRight.setPivotPoint(new BABYLON.Vector3(0, 0.38, 0)); // set pivotPoint with shoulder
         this.handRight.material = this._getDebugMaterial();
 
         this.handLeft.position = new BABYLON.Vector3( -0.3, -0.6,0);
         this.handRight.position = new BABYLON.Vector3( 0.3, -0.6,0);
-        this.handRight.rotation = new BABYLON.Vector3(-Math.PI / 2, 0,0);
         console.log(this.handRight.rotation);
     }
 
@@ -49,16 +60,32 @@ export default class Body {
     }
 
     private _createLegs() {
-        this.legLeft = BABYLON.BoxBuilder.CreateBox("player.leg-left", { width: 0.1, depth: 0.1, height: 0.8 } , this.scene);
+        this.legLeft = BABYLON.BoxBuilder.CreateBox("player.leg-left", { width: 0.1, depth: 0.1, height: 0.7 } , this.scene);
         this.legLeft.parent = this.camera;
         this.legLeft.material = this._getDebugMaterial();
 
-        this.legRight = BABYLON.BoxBuilder.CreateBox("player.leg-Right", { width: 0.1, depth: 0.1, height: 0.8 } , this.scene);
+        this.legRight = BABYLON.BoxBuilder.CreateBox("player.leg-Right", { width: 0.1, depth: 0.1, height: 0.7 } , this.scene);
         this.legRight.parent = this.camera;
         this.legRight.material = this._getDebugMaterial();
 
-        this.legLeft.position = new BABYLON.Vector3( 0.2, -1.6,0);
-        this.legRight.position = new BABYLON.Vector3( -0.2, -1.6,0);
+        this.legLeft.position = new BABYLON.Vector3( 0.1, -1.4,0);
+        this.legRight.position = new BABYLON.Vector3( -0.1, -1.4,0);
+    }
+
+    private _handUpAnimation() {
+        const handUp = new BABYLON.Animation("handUp", "rotation.x", 2, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+        handUp.setKeys([
+            {
+                frame: 0,
+                value: this.handRight.rotation.x
+            },
+            {
+                frame: 1,
+                value: this.defaultWeaponHandRotation.x
+            },
+        ]);
+        this.handRight.animations.push(handUp);
+        this.scene.beginDirectAnimation(this.handRight, [handUp] , 0, 1);
     }
 
     private _getDebugMaterial(){
@@ -68,6 +95,7 @@ export default class Body {
         myMaterial.specularColor = BABYLON.Color3.Black();
         myMaterial.emissiveColor = BABYLON.Color3.Blue();
         myMaterial.ambientColor = BABYLON.Color3.Gray();
+        // myMaterial.alpha = 0;
         return myMaterial;
     }
 }
