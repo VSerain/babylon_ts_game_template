@@ -52,4 +52,8 @@ export default class Structure {
     set scaling(scaling) {
         this.mesh.scaling = scaling;
     }
+
+    getMesh() {
+        return this.mesh;
+    }
 }

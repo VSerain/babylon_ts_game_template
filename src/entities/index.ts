@@ -43,7 +43,7 @@ export default class EntitiesController {
             if (module.glb) {
                 this.store.addAssets(module.name, module.glb);
             }
-            this.loader.addObjectsType(module.name);
+            this.loader.addEnitiesType(module.name);
         });
     }
 
@@ -72,10 +72,17 @@ export default class EntitiesController {
         const instance = new type.default() as Structure;
 
         structureHelpers.applyController(instance, this.loader);
-
         this.entities.push(instance);
 
         if (this.isLoad()) instance.load();
+
+        return instance;
+    }
+
+    disposeEntity(disposedEntity: Structure) {
+        const entityIndex = this.entities.findIndex(entity => entity === disposedEntity);
+        if (entityIndex === -1) return;
+        this.entities.splice(entityIndex, 1);
     }
 
     devSpawnWeapon() {

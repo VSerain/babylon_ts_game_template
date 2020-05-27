@@ -77,6 +77,7 @@ export default class FPSCamera extends BABYLON.UniversalCamera {
         }
 
         this._lastY = this.position.y
+        this.body.checkColisions();
     }
 
     /**

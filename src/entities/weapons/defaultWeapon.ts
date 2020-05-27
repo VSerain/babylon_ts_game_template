@@ -2,6 +2,7 @@ import * as BABYLON from "babylonjs";
 
 import eventManager from "app/shared/eventManager";
 import Structure from "app/shared/structure";
+import DefaultBullet from "./defaultBullet";
 
 export const name = "default-weapon";
 
@@ -13,6 +14,7 @@ export default class DefaultWeapon extends Structure {
     entries: BABYLON.InstantiatedEntries;
     node: BABYLON.TransformNode;
     inFireAnimation: boolean = false;
+    bulletName: string = "default-bullet";
     animations: Array<any> = [];
 
     constructor() {
@@ -73,7 +75,13 @@ export default class DefaultWeapon extends Structure {
     }
 
     async fire() {
+        const bullet = this.entitiesController.createEntities("default-bullet") as DefaultBullet;
+        const cameraRay = BABYLON.Ray.CreateNewFromTo(this.playerController.camera.position, this.playerController.camera.getTarget());
+        bullet.parentDirection = cameraRay.direction;
+        bullet.parentPosition = this.absolutePosition.clone().add(new BABYLON.Vector3(0,0.2,0));
+
         this.inFireAnimation = true;
+        bullet.fire();
         await this.startAnimation("fire");
         this.inFireAnimation = false;
     }
@@ -149,5 +157,30 @@ export default class DefaultWeapon extends Structure {
             speed: 3,
             animation: fireAnimation
         });
+    }
+
+    get position() {
+        return this.node.position;
+    }
+    set position(position) {
+        this.node.position = position;
+    }
+
+    get absolutePosition() {
+        return this.node.getAbsolutePosition();
+    }
+
+    get rotation() {
+        return this.node.rotation;
+    }
+    set rotation(rotation) {
+        this.node.rotation = rotation;
+    }
+
+    get scaling() {
+        return this.node.scaling;
+    }
+    set scaling(scaling) {
+        this.node.scaling = scaling;
     }
 }

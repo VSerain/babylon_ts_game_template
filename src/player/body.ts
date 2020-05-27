@@ -2,6 +2,7 @@ import * as BABYLON from "babylonjs";
 import eventManager from "app/shared/eventManager";
 
 import FPSCamera from "./fpsCamera";
+import Structure from "app/shared/structure";
 
 export default class Body {
     head: BABYLON.Mesh;
@@ -11,6 +12,9 @@ export default class Body {
     legLeft: BABYLON.Mesh;
     legRight: BABYLON.Mesh;
 
+    colidedMeshes: Array<BABYLON.Mesh> = [];
+    structuresColided: Array<Structure> = [];
+
     defaultWeaponHandRotation: BABYLON.Vector3 = new BABYLON.Vector3(-Math.PI / 2, 0,0);
 
     constructor(private camera: FPSCamera, private scene: BABYLON.Scene) {
@@ -19,11 +23,35 @@ export default class Body {
         this._createBody();
         this._createLegs();
 
+        eventManager.addMultiple("player.body.colide", "player.body.structuresColided.add" , "player.body.structuresColided.remove");
+
         eventManager.on("player.activeWeapon", { layer: Infinity}, (cbStop, weapon) => {
             this._handUpAnimation();
         });
         eventManager.on("player.unactiveWeapon", {}, (cbStop, weapon) => {
             this.handRight.rotation = new BABYLON.Vector3();
+        });
+
+        eventManager.on("player.body.structuresColided.add", { layer: 1 }, (callbackStop, structure: Structure) => {
+            this.structuresColided.push(structure);
+            callbackStop();
+        });
+
+        eventManager.on("player.body.structuresColided.remove", { layer: 1 }, (callbackStop, structure: Structure) => {
+            callbackStop();
+            const index = this.structuresColided.findIndex(struct => struct === structure );
+            if (index === -1) return;
+            this.structuresColided.splice(index, 1);
+        });
+    }
+
+    public checkColisions() {
+        this.structuresColided.forEach(structure => {
+            this.colidedMeshes.forEach(partOfBody => {
+                if (partOfBody.intersectsMesh(structure.getMesh())) {
+                    eventManager.call("player.body.colide", [partOfBody.name, partOfBody, structure]);
+                }
+            });
         });
     }
 
@@ -32,7 +60,9 @@ export default class Body {
         this.head.parent = this.camera;
         this.head.material = this._getDebugMaterial();
 
-        this.head.position = new BABYLON.Vector3( 0, 0, 0);
+        this.head.position = new BABYLON.Vector3(0, 0, 0);
+
+        this.colidedMeshes.push(this.head);
 
     }
 
@@ -49,7 +79,10 @@ export default class Body {
 
         this.handLeft.position = new BABYLON.Vector3( -0.3, -0.6,0);
         this.handRight.position = new BABYLON.Vector3( 0.3, -0.6,0);
-        console.log(this.handRight.rotation);
+
+        this.colidedMeshes.push(this.handRight);
+        this.colidedMeshes.push(this.handLeft);
+
     }
 
     private _createBody() {
@@ -57,6 +90,9 @@ export default class Body {
         this.body.parent = this.camera;
         this.body.material = this._getDebugMaterial();
         this.body.position = new BABYLON.Vector3(0, -0.6,0);
+
+        this.colidedMeshes.push(this.body);
+
     }
 
     private _createLegs() {
@@ -70,6 +106,9 @@ export default class Body {
 
         this.legLeft.position = new BABYLON.Vector3( 0.1, -1.4,0);
         this.legRight.position = new BABYLON.Vector3( -0.1, -1.4,0);
+
+        this.colidedMeshes.push(this.legRight);
+        this.colidedMeshes.push(this.legLeft);
     }
 
     private _handUpAnimation() {
