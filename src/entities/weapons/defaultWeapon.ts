@@ -16,6 +16,8 @@ export default class DefaultWeapon extends Structure {
     inFireAnimation: boolean = false;
     bulletName: string = "default-bullet";
     animations: Array<any> = [];
+    groupAnimation: BABYLON.AnimationGroup;
+    currentAnimatable: BABYLON.Animatable;
 
     constructor() {
         super(new BABYLON.Mesh("tmpMesh"), {});
@@ -36,6 +38,7 @@ export default class DefaultWeapon extends Structure {
 
         eventManager.on("player.input.mouse.right.click", {}, () => {
             if (this.inFireAnimation || !this.isAttached) return;
+
             this.fire();
         });
 
@@ -48,7 +51,6 @@ export default class DefaultWeapon extends Structure {
                 this.startAnimation("walk");
             }
         });
-
 
         this.playerController.addWeapon(this);
     }
@@ -75,23 +77,27 @@ export default class DefaultWeapon extends Structure {
     }
 
     async fire() {
+        const cameraRay = new BABYLON.Ray(this.absolutePosition.clone().add(new BABYLON.Vector3(0, 0.2,0)), this.playerController.camera.getTarget().subtract(this.playerController.camera.position).normalize(), 1);
         const bullet = this.entitiesController.createEntities("default-bullet") as DefaultBullet;
-        const cameraRay = BABYLON.Ray.CreateNewFromTo(this.playerController.camera.position, this.playerController.camera.getTarget());
-        bullet.parentDirection = cameraRay.direction;
-        bullet.parentPosition = this.absolutePosition.clone().add(new BABYLON.Vector3(0,0.2,0));
+        bullet.parentStructure = this;
+        bullet.colidedStructures = this.playerController.camera.body.structuresColided;
+        bullet.ray = cameraRay;
 
         this.inFireAnimation = true;
         bullet.fire();
+        console.time("fire");
+        console.time("fire1");
         await this.startAnimation("fire");
+        console.timeEnd("fire");
         this.inFireAnimation = false;
     }
 
-    async startAnimation(animationName: String): Promise<boolean> {
+    async startAnimation(animationName: String): Promise<any> {
         const animationData = this.animations.find(animationData => animationData.name === animationName);
         if (!animationData) return false;
-        const animatable = this.sceneryController.scene.beginDirectAnimation(this.node, [animationData.animation] , animationData.start, animationData.end, animationData.loop, animationData.speed);
-        await animatable.waitAsync();
-        return true;
+        this.currentAnimatable = this.sceneryController.scene.beginDirectAnimation(this.node, [animationData.animation] , animationData.start, animationData.end, animationData.loop, animationData.speed);
+
+        return this.currentAnimatable.waitAsync();
     }
 
     computeAnimation(node: BABYLON.TransformNode) {
@@ -101,19 +107,19 @@ export default class DefaultWeapon extends Structure {
 
         walkKey.push(
             {
-                frame: 20,
+                frame: 0,
                 value: node.position.y
             },
             {
-                frame: 21,
+                frame: 1,
                 value: node.position.y + 0.004
             },
             {
-                frame: 22,
+                frame: 2,
                 value: node.position.y + 0.008
             },
             {
-                frame: 23,
+                frame: 3,
                 value: node.position.y
             }
         );
@@ -122,8 +128,8 @@ export default class DefaultWeapon extends Structure {
         
         this.animations.push({
             name: "walk",
-            start: 20,
-            end: 23,
+            start: 0,
+            end: 3,
             loop: true,
             speed: 1,
             animation: walkAnimation
@@ -157,6 +163,8 @@ export default class DefaultWeapon extends Structure {
             speed: 3,
             animation: fireAnimation
         });
+
+
     }
 
     get position() {

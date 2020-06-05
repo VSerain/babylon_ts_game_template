@@ -12,7 +12,6 @@ export default class EntitiesController {
     scene: BABYLON.Scene;
     store: Store;
 
-
     private data = {
         load: false,
     }

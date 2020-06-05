@@ -1,9 +1,8 @@
 import * as BABYLON from "babylonjs";
 import Loader from "app/loader/index";
-import Structrue from "./structure";
 import Structure from "./structure";
 
-export function applyController(structure: Structrue, loader: Loader) {
+export function applyController(structure: Structure, loader: Loader) {
     if (structure.require.playerController) {
         structure.playerController = loader.playerController;
     }
@@ -19,7 +18,7 @@ export function applyController(structure: Structrue, loader: Loader) {
 }
 
 export function getStructureByMesh(mesh: BABYLON.AbstractMesh): Structure | null {
-    if (mesh.metadata.instance) return mesh.metadata.instance as Structrue;
+    if (mesh.metadata && mesh.metadata.instance) return mesh.metadata.instance as Structure;
 
     if (mesh.parent && mesh.parent instanceof BABYLON.AbstractMesh) return getStructureByMesh(mesh.parent as BABYLON.AbstractMesh);
 
