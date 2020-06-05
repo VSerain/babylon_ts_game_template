@@ -12,7 +12,7 @@ For dev
 
 # Fonctionement Global
 
-Le but est simplifier le demarage d'un jeu 3d
+Le but est simplifier le demarage d'un jeu 3d 
 
 Pour celà l'architecture est séparer en 5 grosse parties :
 
