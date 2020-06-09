@@ -85,18 +85,14 @@ export default class DefaultWeapon extends Structure {
 
         this.inFireAnimation = true;
         bullet.fire();
-        console.time("fire");
-        console.time("fire1");
         await this.startAnimation("fire");
-        console.timeEnd("fire");
         this.inFireAnimation = false;
     }
 
     async startAnimation(animationName: String): Promise<any> {
         const animationData = this.animations.find(animationData => animationData.name === animationName);
-        if (!animationData) return false;
+        if (!animationData)  return false;
         this.currentAnimatable = this.sceneryController.scene.beginDirectAnimation(this.node, [animationData.animation] , animationData.start, animationData.end, animationData.loop, animationData.speed);
-
         return this.currentAnimatable.waitAsync();
     }
 
