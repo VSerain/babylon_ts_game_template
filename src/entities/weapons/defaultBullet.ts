@@ -91,17 +91,17 @@ export default class DefaultBullet extends Structure {
     }
 
     renderLoop() {
-        if (!this.animatable) return;
-        // this.checkColide();
+        if (!this.animatable || this.mesh.isDisposed()) return;
+        this.checkColide();
 
-        // this.lastPosition = this.position.clone();
+        this.lastPosition = this.position.clone();
     }
 
     checkColide() {
         const directionVector = this.position.subtract(this.lastPosition);
         const ray = new BABYLON.Ray(this.lastPosition, directionVector.clone().normalize(), directionVector.length());
         const pickInfo = this.sceneryController.scene.pickWithRay(ray, (mesh) => getStructureByMesh(mesh) ? true : false);
-        debugRay(ray, this.sceneryController.scene);
+        // debugRay(ray, this.sceneryController.scene);
 
         if (!pickInfo || !pickInfo.pickedMesh) return;
 
