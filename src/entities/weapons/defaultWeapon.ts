@@ -83,7 +83,7 @@ export default class DefaultWeapon extends Structure {
         bullet.colidedStructures = this.playerController.camera.body.structuresColided;
         bullet.ray = cameraRay;
 
-        this.inFireAnimation = true;
+        // this.inFireAnimation = true;
         bullet.fire();
         await this.startAnimation("fire");
         this.inFireAnimation = false;
