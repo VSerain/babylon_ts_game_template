@@ -92,9 +92,9 @@ export default class DefaultBullet extends Structure {
 
     renderLoop() {
         if (!this.animatable) return;
-        this.checkColide();
+        // this.checkColide();
 
-        this.lastPosition = this.position.clone();
+        // this.lastPosition = this.position.clone();
     }
 
     checkColide() {
