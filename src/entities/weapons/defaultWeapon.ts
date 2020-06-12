@@ -83,10 +83,8 @@ export default class DefaultWeapon extends Structure {
         bullet.colidedStructures = this.playerController.camera.body.structuresColided;
         bullet.ray = cameraRay;
 
-        this.inFireAnimation = true;
         bullet.fire();
         await this.startAnimation("fire");
-        this.inFireAnimation = false;
     }
 
     async startAnimation(animationName: String): Promise<any> {
@@ -136,15 +134,15 @@ export default class DefaultWeapon extends Structure {
 
         fireKey.push(
             {
-                frame: 10,
+                frame: 0,
                 value: node.rotation.z
             },
             {
-                frame: 11,
+                frame: 1,
                 value: node.rotation.z - Math.PI / 12
             },
             {
-                frame: 12,
+                frame: 2,
                 value: node.rotation.z
             }
         );
@@ -153,8 +151,8 @@ export default class DefaultWeapon extends Structure {
         
         this.animations.push({
             name: "fire",
-            start: 10,
-            end: 12,
+            start: 0,
+            end: 2,
             loop: false,
             speed: 3,
             animation: fireAnimation

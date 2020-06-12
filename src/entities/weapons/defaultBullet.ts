@@ -81,13 +81,11 @@ export default class DefaultBullet extends Structure {
             }
         ]);
 
-        const animationEndEvent = new BABYLON.AnimationEvent(this.maxDistLife -1 , () => this.dispose(), true);
-
-        fireAnimation.addEvent(animationEndEvent);
-
         this.mesh.animations.push(fireAnimation);
-
+        
         this.animatable = this.sceneryController.scene.beginDirectAnimation(this.mesh, [fireAnimation] , 0 , this.maxDistLife);
+
+        this.animatable.onAnimationEnd = () => this.dispose();
     }
 
     renderLoop() {

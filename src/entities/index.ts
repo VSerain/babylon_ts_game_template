@@ -71,9 +71,9 @@ export default class EntitiesController {
         const instance = new type.default() as Structure;
 
         structureHelpers.applyController(instance, this.loader);
-        this.entities.push(instance);
 
         if (this.isLoad()) instance.load();
+        this.entities.push(instance);
 
         return instance;
     }
