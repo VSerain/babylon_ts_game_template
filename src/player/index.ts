@@ -13,8 +13,6 @@ export default class PlayerController {
     canvas: HTMLCanvasElement;
     ui: UI;
 
-    weapons: Array<Structure> = [];
-
     constructor(private loader: Loader) {
         this.loader.playerController = this;
         this.loader.addPlayerType("player-camera"); 
@@ -36,13 +34,6 @@ export default class PlayerController {
         if (type === "player-camera") {
             this.camera = new FPSCamera("player-camera", mesh.position.clone(), this.scene);
             mesh.dispose();
-        }
-    }
-
-    addWeapon(weapon: Structure) {
-        this.weapons.push(weapon);
-        if (this.weapons.length === 1) {
-            eventManager.call("player.activeWeapon", [weapon])
         }
     }
 }

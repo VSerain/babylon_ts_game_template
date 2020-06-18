@@ -31,7 +31,8 @@ export default class WeaponSpawner extends Structure {
         eventManager.on("player.input.interactive.on", {}, (cbStop) => {
             if (!this.eventActive || this.representationNode.isDisposed()) return
             this.representationNode.dispose();
-            this.entitiesController.createEntities(this.weaponName);
+            const structure = this.entitiesController.createEntities(this.weaponName) as any;
+            this.playerController.camera.addWeapon(structure);
             cbStop();
         });
 

@@ -66,7 +66,7 @@ export default class EntitiesController {
 
     createEntities(entityName:string) {
         const type = this.types.find((type) => type.name == entityName);
-        if (!type) return;
+        if (!type) throw new Error(`entity type ${type} was not found`);
 
         const instance = new type.default() as Structure;
 

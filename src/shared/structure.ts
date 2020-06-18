@@ -4,6 +4,7 @@ import ObjectsController from "app/objects/index";
 import EntitiesController from "app/entities/index";
 import SceneryController from "app/scenery/index";
 
+import { WeaponOwner, Touchable } from 'app/entities/interfaces';
 export default class Structure {
     require = {
         playerController: false,
@@ -55,5 +56,14 @@ export default class Structure {
 
     getMesh() {
         return this.mesh;
+    }
+
+    wasTouched(by: Structure, at: BABYLON.Mesh, pickInfo: BABYLON.PickingInfo, owner: WeaponOwner): boolean {
+        console.log(by, owner);
+        return true;
+    }
+
+    toTouch(touchable: Touchable, pickInfo: BABYLON.PickingInfo) {
+
     }
 }

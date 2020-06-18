@@ -1,9 +1,10 @@
 import * as BABYLON from "babylonjs";
 
-import eventManager from "app/shared/eventManager";
 import Structure from "app/shared/structure";
-import { getStructureByMesh } from "app/shared/structure-helpers";
+import { getTouchableByMesh } from "app/shared/structure-helpers";
 import { debugRay } from "app/shared/debug-helpers";
+
+import { Touchable, Weapon } from "app/entities/interfaces";
 
 export const name = "default-bullet";
 
@@ -20,8 +21,7 @@ export default class DefaultBullet extends Structure {
     lastPosition: BABYLON.Vector3 = new BABYLON.Vector3();
     impactMaterial: BABYLON.Material;
     
-    parentStructure: Structure;
-    colidedStructures: Array<Structure> = [];
+    parent: Weapon;
 
     constructor() {
         super(new BABYLON.Mesh("tmpMesh"), {});
@@ -46,13 +46,6 @@ export default class DefaultBullet extends Structure {
 
     load() {
         this.initMaterial();
-
-        eventManager.on("player.body.colide", {
-            filter: (partName: string, mesh: BABYLON.Mesh, structureColided: Structure) => structureColided === this,
-        }, (cbStop, partName: string, mesh: BABYLON.Mesh) => {
-            cbStop();
-            this.playerTouched(partName, mesh)
-        })
     }
 
     playerTouched(partName: string, mesh: BABYLON.Mesh) {
@@ -98,25 +91,29 @@ export default class DefaultBullet extends Structure {
     checkColide() {
         const directionVector = this.position.subtract(this.lastPosition);
         const ray = new BABYLON.Ray(this.lastPosition, directionVector.clone().normalize(), directionVector.length());
-        const pickInfo = this.sceneryController.scene.pickWithRay(ray, (mesh) => getStructureByMesh(mesh) ? true : false);
+        const pickInfo = this.sceneryController.scene.pickWithRay(ray, (mesh) => getTouchableByMesh(mesh) ? true : false);
         // debugRay(ray, this.sceneryController.scene);
 
         if (!pickInfo || !pickInfo.pickedMesh) return;
 
-        const structure = getStructureByMesh(pickInfo?.pickedMesh) as Structure;
+        const touchable = getTouchableByMesh(pickInfo?.pickedMesh) as Touchable;
 
-        if (!this.colidedStructures.includes(structure)) {
-            console.log(pickInfo);
-            this.explode(pickInfo.pickedPoint as BABYLON.Vector3, pickInfo.faceId, structure);
+        if (!touchable) return;
+
+        this.parent.owner.toTouch(touchable, pickInfo);
+
+        const destroy = touchable.wasTouched(this, pickInfo.pickedMesh, pickInfo, this.parent.owner);
+
+        if (destroy) {
+            this.explode(pickInfo.pickedPoint as BABYLON.Vector3, pickInfo.faceId, pickInfo.pickedMesh);
             this.dispose();
             return;
         }
 
-        console.log(structure, pickInfo);
+        console.log(touchable, pickInfo);
     }
 
-    explode(positionImpact: BABYLON.Vector3, faceId: number, structure: Structure) {
-        const structureMesh = structure.getMesh();
+    explode(positionImpact: BABYLON.Vector3, faceId: number, structureMesh: BABYLON.AbstractMesh) {
         const impact = BABYLON.MeshBuilder.CreateDecal("decal", structureMesh, {
             position: positionImpact,
             normal: structureMesh.getFacetNormal(faceId).scale(-1), 
@@ -131,7 +128,6 @@ export default class DefaultBullet extends Structure {
     dispose() {
         if (this.animatable) this.animatable.stop();
         this.mesh.dispose();
-        eventManager.call("player.body.structuresColided.remove", [this]);
         this.entitiesController.disposeEntity(this);
     }
 }

@@ -1,8 +1,9 @@
 import * as BABYLON from "babylonjs";
 
-import eventManager from "app/shared/eventManager";
 import Structure from "app/shared/structure";
+
 import DefaultBullet from "./defaultBullet";
+import { WeaponOwner } from 'app/entities/interfaces';
 
 export const name = "default-weapon";
 
@@ -10,11 +11,14 @@ export const glb = "weapon.glb"
 
 export default class DefaultWeapon extends Structure {
     weaponName: string = name;
-    isAttached: boolean = false;
+    bulletName: string = "default-bullet";
+
     entries: BABYLON.InstantiatedEntries;
     node: BABYLON.TransformNode;
-    inFireAnimation: boolean = false;
-    bulletName: string = "default-bullet";
+
+    owner: WeaponOwner;
+    isAttached: boolean = false;
+
     animations: Array<any> = [];
     groupAnimation: BABYLON.AnimationGroup;
     currentAnimatable: BABYLON.Animatable;
@@ -26,40 +30,12 @@ export default class DefaultWeapon extends Structure {
         this.require.sceneryController = true;
     }
 
-    load() {
-        eventManager.on("player.activeWeapon", {}, (cbStop, weapon) => {
-            if (this.name !== weapon.name) return;
-            this.attachToPlayer();
-        });
-        eventManager.on("player.unactiveWeapon", {}, (cbStop, weapon) => {
-            if (this.name !== weapon.name) return;
-            this.detachToPlayer();
-        });
-
-        eventManager.on("player.input.mouse.right.click", {}, () => {
-            if (this.inFireAnimation || !this.isAttached) return;
-
-            this.fire();
-        });
-
-        eventManager.on("player.move.status.changed", {}, (cbStop, status) => {
-            if (status === "static") {
-                this.sceneryController.scene.stopAnimation(this.node, "walk");
-            }
-            else if (status === "walk") {
-                if (this.inFireAnimation) return;
-                this.startAnimation("walk");
-            }
-        });
-
-        this.playerController.addWeapon(this);
-    }
-
-    attachToPlayer() {
+    attachToParent(parentMesh: BABYLON.Mesh, owner: WeaponOwner) {
         this.isAttached = true;
         this.entries = this.entitiesController.store.getEntries(name);
         this.node = this.entries.rootNodes[0];
-        this.node.parent = this.playerController.camera.body.handRight;
+        this.node.parent = parentMesh;
+        this.owner = owner;
         
         this.node.position = new BABYLON.Vector3(0, -0.6 , -0.1);
         this.node.rotation = new BABYLON.Vector3(0, Math.PI / 2,  Math.PI / 2);
@@ -69,19 +45,29 @@ export default class DefaultWeapon extends Structure {
         this.computeAnimation(this.node);
     }
 
-    detachToPlayer() {
+    detachToParent() {
         this.isAttached = false;
         this.node.animations = [];
         this.node.parent = null;
         this.node.dispose();
     }
 
+    onParentMoveStatusChange(status: string) {
+        if (status === "static") {
+            this.sceneryController.scene.stopAnimation(this.node, "walk");
+        }
+        else if (status === "walk") {
+            this.startAnimation("walk");
+        }
+    }
+
     async fire() {
-        const cameraRay = new BABYLON.Ray(this.absolutePosition.clone().add(new BABYLON.Vector3(0, 0.2,0)), this.playerController.camera.getTarget().subtract(this.playerController.camera.position).normalize(), 1);
+        if (!this.isAttached) return;
+
+        const directionRay = new BABYLON.Ray(this.absolutePosition.clone().add(new BABYLON.Vector3(0, 0.2,0)), this.owner.directionVector, 1);
         const bullet = this.entitiesController.createEntities("default-bullet") as DefaultBullet;
-        bullet.parentStructure = this;
-        bullet.colidedStructures = this.playerController.camera.body.structuresColided;
-        bullet.ray = cameraRay;
+        bullet.parent = this;
+        bullet.ray = directionRay;
 
         bullet.fire();
         await this.startAnimation("fire");
