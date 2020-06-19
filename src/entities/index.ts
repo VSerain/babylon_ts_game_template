@@ -3,85 +3,25 @@ import * as BABYLON from "babylonjs";
 import Loader from "app/loader/index";
 import Store from "./store";
 import eventManager from "app/shared/eventManager";
-import Structure from "app/shared/structure";
-import * as structureHelpers from "app/shared/structure-helpers";
-
-import Weapons from "./weapons/index";
 
 export default class EntitiesController {
     scene: BABYLON.Scene;
     store: Store;
 
-    private data = {
-        load: false,
-    }
-
-    types: Array<any> = [];
-
-    entities: Array<Structure> = [];
-
     constructor(private loader: Loader) {
         this.loader.entitiesController = this;
         this.store = new Store(this.loader);
-        this.initTypes();
+        this.store.addAssets("default-weapon", "weapon.glb");
 
         eventManager.on("loader.sceneLoaded", {}, () => {
-            this.data.load = true;
-            this.entities.forEach(entity => entity.load());
+            // this.devSpawnWeapon();
         });
     }
 
-    isLoad() {
-        return this.data.load;
-    }
+    renderLoop() {}
 
-    initTypes() {
-        this.types.push(...Weapons);
+    addMesh(type: string, mesh: BABYLON.AbstractMesh, data?: any) {
 
-        this.types.forEach((module) => {
-            if (module.glb) {
-                this.store.addAssets(module.name, module.glb);
-            }
-            this.loader.addEnitiesType(module.name);
-        });
-    }
-
-    renderLoop() {
-        if (!this.isLoad()) return;
-        this.entities.forEach(entity => entity.renderLoop());
-    }
-
-    addMesh(typeName: string, mesh: BABYLON.AbstractMesh, data?: any) {
-        const type = this.types.find((type) => type.name == typeName);
-        if (!type) return;
-
-        if (!mesh.metadata) mesh.metadata = {};
-        
-        const instance = new type.default(mesh, data) as Structure;
-
-        structureHelpers.applyController(instance, this.loader);
-
-        this.entities.push(instance);
-    }
-
-    createEntities(entityName:string) {
-        const type = this.types.find((type) => type.name == entityName);
-        if (!type) throw new Error(`entity type ${type} was not found`);
-
-        const instance = new type.default() as Structure;
-
-        structureHelpers.applyController(instance, this.loader);
-
-        if (this.isLoad()) instance.load();
-        this.entities.push(instance);
-
-        return instance;
-    }
-
-    disposeEntity(disposedEntity: Structure) {
-        const entityIndex = this.entities.findIndex(entity => entity === disposedEntity);
-        if (entityIndex === -1) return;
-        this.entities.splice(entityIndex, 1);
     }
 
     devSpawnWeapon() {

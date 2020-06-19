@@ -4,12 +4,10 @@ import * as BABYLON from "babylonjs";
 import Loader from "app/loader/index";
 import UI from "./ui/index";
 import FPSCamera from "./fpsCamera";
-import Structure from "app/shared/structure";
-import eventManager from "app/shared/eventManager";
 
 export default class PlayerController {
     scene: BABYLON.Scene;
-    camera: FPSCamera;
+    camera: BABYLON.UniversalCamera;
     canvas: HTMLCanvasElement;
     ui: UI;
 
@@ -18,8 +16,6 @@ export default class PlayerController {
         this.loader.addPlayerType("player-camera"); 
         this.canvas = this.loader.canvas;
         this.ui = new UI();
-
-        eventManager.addMultiple("player.activeWeapon", "player.unactiveWeapon");
     }
 
     /**

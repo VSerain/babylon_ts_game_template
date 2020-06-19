@@ -6,7 +6,6 @@ import * as structureHelpers from "app/shared/structure-helpers";
 import Loader from "app/loader/index";
 
 import Buttons from "./buttons/index"
-import Spawners from "./spawner/index"
 
 export default class ObjectsController {
     scene: BABYLON.Scene;
@@ -25,7 +24,6 @@ export default class ObjectsController {
 
         eventManager.on("loader.sceneLoaded", {}, () => {
             this.data.load = true;
-            this.interactiveObjects.forEach(object => object.load());
         });
     }
 
@@ -35,7 +33,6 @@ export default class ObjectsController {
 
     initTypes() {
         this.types.push(...Buttons);
-        this.types.push(...Spawners);
 
         this.types.forEach((module) => {
             this.loader.addObjectsType(module.name);
@@ -60,7 +57,6 @@ export default class ObjectsController {
         structureHelpers.applyController(instance, this.loader);
 
         this.interactiveObjects.push(instance);
-
-        if (this.isLoad()) instance.load();
+        instance.load();
     }
 }

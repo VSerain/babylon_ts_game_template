@@ -112,7 +112,6 @@ export default class Loader {
         this.entitiesController.scene = this.scene;
 
         // this.__dev__spawnButton();
-        this.__dev__spawnWeaponSpawner();
         eventManager.call("loader.beforeImportMap");
 
         BABYLON.SceneLoader.Append(IMPORT_GLB.FOLDER_PATH, IMPORT_GLB.MAP_FILE_NAME, this.scene, () => {
@@ -204,27 +203,5 @@ export default class Loader {
         );
         anim.setKeys(keys);
         s.animations.push(anim);
-    }
-
-    __dev__spawnWeaponSpawner() {
-        const s = BABYLON.BoxBuilder.CreateBox("weapon", {}, this.scene);
-        s.position = new BABYLON.Vector3(-10,1,-10);
-        s.metadata = {
-            gltf: {
-                extras: {
-                    type: "weapon-spawner",
-                    weapon: "default-weapon"
-                }
-            }
-        };
-
-        var myMaterial = new BABYLON.StandardMaterial("myMaterial", this.scene);
-
-        myMaterial.diffuseColor = BABYLON.Color3.Red();
-        myMaterial.specularColor = BABYLON.Color3.Red();
-        myMaterial.emissiveColor = BABYLON.Color3.Red();
-        myMaterial.ambientColor = BABYLON.Color3.Red();
-
-        s.material = myMaterial;
     }
 }

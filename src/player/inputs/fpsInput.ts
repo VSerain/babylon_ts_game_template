@@ -46,8 +46,7 @@ export default class FpsInput implements BABYLON.ICameraInput<FPSCamera> {
     constructor() {
         eventManager.addMultiple(
             "player.input.interactive.on",
-            "player.input.interactive.off",
-            "player.input.mouse.right.click"
+            "player.input.interactive.off"
         )
     }
 
@@ -61,9 +60,6 @@ export default class FpsInput implements BABYLON.ICameraInput<FPSCamera> {
     attachControl(element: HTMLElement, noPreventDefault?: boolean) {
         element.addEventListener("keyup", (evt: KeyboardEvent) => this._onKeyUp(evt, noPreventDefault))
         element.addEventListener("keydown", (evt: KeyboardEvent) => this._onKeyDown(evt, noPreventDefault))
-        element.addEventListener("click", (evt: MouseEvent) => { // Todo clean me
-            eventManager.call("player.input.mouse.right.click");
-        })
     }
 
     detachControl(element: HTMLElement) {
@@ -172,14 +168,6 @@ export default class FpsInput implements BABYLON.ICameraInput<FPSCamera> {
             this.maxJumpY = this.camera.position.y + this.camera.jumpHeight;
         }
         const directionVector = this.computeDirectionVector();
-
-        if (directionVector.equalsWithEpsilon(BABYLON.Vector3.Zero())) { // Player is static
-            this.camera.switchToStatic();
-        }
-        else {
-            this.camera.switchToWalk();
-        }
-
         this.lastDirection = directionVector;
         this.camera.cameraDirection = directionVector.clone();
     }

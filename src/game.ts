@@ -56,8 +56,6 @@ export default class Game {
         window.addEventListener('resize', () => {
             this.engine.resize();
         });
-
-        eventManager.add("game.debug");
     }
 
     attachCallback() {
@@ -76,8 +74,8 @@ export default class Game {
         cameraDebug.keysUp = [90];
         cameraDebug.keysRight = [68];
         cameraDebug.keysLeft = [81];
+
         scene.activeCamera = cameraDebug;
-        eventManager.call("game.debug");
     }
 
 }
