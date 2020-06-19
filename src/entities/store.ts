@@ -12,7 +12,7 @@ export default class Store {
             name,
             loaded: false,
         };
-        this.loader.loadAssetsContainer("weapon.glb").then(container => {
+        this.loader.loadAssetsContainer(fileName).then(container => {
             this.storedContainer[name].container = container;
             this.storedContainer[name].loaded = true;
         });
