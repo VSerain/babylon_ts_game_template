@@ -20,7 +20,7 @@ export interface Touchable {
     wasTouched(by: Structure, at: BABYLON.AbstractMesh, pickInfo: BABYLON.PickingInfo, owner: WeaponOwner): boolean
 }
 
-export interface Weapon {
+export interface Weapon extends Structure {
     owner: WeaponOwner;
     attachToParent(parentMesh: BABYLON.Mesh, owner: WeaponOwner): void
     detachToParent(): void

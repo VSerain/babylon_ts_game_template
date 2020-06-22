@@ -37,6 +37,7 @@ export default class Game {
         this.attachCallback();
 
         this.engine = new BABYLON.Engine(this.canvas, ENGINE_CONFIG.ANTIALIAS);
+        this.engine.loadingScreen.loadingUIText = "KývosStudio";
 
         this.loader = new Loader(this.engine, this.canvas);
         this.playerController = new PlayerController(this.loader);

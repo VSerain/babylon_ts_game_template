@@ -15,7 +15,7 @@ export default class DefaultBullet extends Structure {
     node: BABYLON.TransformNode;
     animatable: BABYLON.Animatable;
     ray: BABYLON.Ray;
-    speed: number = 100;
+    speed: number = 10;
     maxDistLife: number = 100;
     sizeImpact: BABYLON.Vector3 = new BABYLON.Vector3(0.08, 0.08, 0.08);
     lastPosition: BABYLON.Vector3 = new BABYLON.Vector3();

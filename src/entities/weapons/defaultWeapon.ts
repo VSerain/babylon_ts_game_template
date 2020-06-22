@@ -81,6 +81,7 @@ export default class DefaultWeapon extends Structure {
     }
 
     computeAnimation(node: BABYLON.TransformNode) {
+        this.animations = [];
         node.animations = [];
         const walkAnimation = new BABYLON.Animation("walk", "position.y", 4, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
         const walkKey = []; 

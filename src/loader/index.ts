@@ -113,6 +113,7 @@ export default class Loader {
 
         // this.__dev__spawnButton();
         this.__dev__spawnWeaponSpawner();
+        this.__dev__spawnEnemiesSpawner();
         eventManager.call("loader.beforeImportMap");
 
         BABYLON.SceneLoader.Append(IMPORT_GLB.FOLDER_PATH, IMPORT_GLB.MAP_FILE_NAME, this.scene, () => {
@@ -132,6 +133,7 @@ export default class Loader {
             });
 
             this._loadAllContainerQueue().then( () => {
+                this.importContainerQueue = [];
                 this.mapLoaded = true;
                 eventManager.call("loader.sceneLoaded");
             });
@@ -163,8 +165,6 @@ export default class Loader {
     }
 
     private _loadAssetsContainer(containerQueueItem: ContainerQueueItem, next: () => void) {
-        const index = this.importContainerQueue.findIndex(item => item === containerQueueItem);
-        if (index) this.importContainerQueue.splice(index, 1);
         BABYLON.SceneLoader.LoadAssetContainer(IMPORT_GLB.FOLDER_PATH, containerQueueItem.file, this.scene, (container) => {
             containerQueueItem.resolver(container)
             next();
@@ -226,5 +226,30 @@ export default class Loader {
         myMaterial.ambientColor = BABYLON.Color3.Red();
 
         s.material = myMaterial;
+    }
+
+    __dev__spawnEnemiesSpawner() {
+        const s = BABYLON.BoxBuilder.CreateBox("enemiesSpawner", {}, this.scene);
+        s.position = new BABYLON.Vector3(10,1,10);
+        s.metadata = {
+            gltf: {
+                extras: {
+                    type: "enemies-spawner",
+                    enemiesNames: "default-turret",
+                    enemiesQuantity: 1,
+                    delayBetweenSpawn: 3,
+                }
+            }
+        };
+
+        var myMaterial = new BABYLON.StandardMaterial("myMaterial", this.scene);
+
+        myMaterial.diffuseColor = BABYLON.Color3.Blue();
+        myMaterial.specularColor = BABYLON.Color3.Blue();
+        myMaterial.emissiveColor = BABYLON.Color3.Blue();
+        myMaterial.ambientColor = BABYLON.Color3.Blue();
+
+        s.material = myMaterial;
+        s.material.alpha = 0.2;
     }
 }

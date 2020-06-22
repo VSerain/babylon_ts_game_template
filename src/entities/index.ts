@@ -7,6 +7,7 @@ import Structure from "app/shared/structure";
 import * as structureHelpers from "app/shared/structure-helpers";
 
 import Weapons from "./weapons/index";
+import Enemies from "./enemies/index";
 
 export default class EntitiesController {
     scene: BABYLON.Scene;
@@ -37,9 +38,11 @@ export default class EntitiesController {
 
     initTypes() {
         this.types.push(...Weapons);
+        this.types.push(...Enemies);
 
         this.types.forEach((module) => {
             if (module.glb) {
+                console.log(module.name, module.glb);
                 this.store.addAssets(module.name, module.glb);
             }
             this.loader.addEnitiesType(module.name);
@@ -72,8 +75,8 @@ export default class EntitiesController {
 
         structureHelpers.applyController(instance, this.loader);
 
-        if (this.isLoad()) instance.load();
         this.entities.push(instance);
+        if (this.isLoad()) instance.load();
 
         return instance;
     }

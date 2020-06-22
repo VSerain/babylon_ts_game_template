@@ -36,7 +36,7 @@ export default class ObjectsController {
     initTypes() {
         this.types.push(...Buttons);
         this.types.push(...Spawners);
-
+        console.log(Spawners);
         this.types.forEach((module) => {
             this.loader.addObjectsType(module.name);
         });
@@ -62,5 +62,11 @@ export default class ObjectsController {
         this.interactiveObjects.push(instance);
 
         if (this.isLoad()) instance.load();
+    }
+
+    disposeObject(disposedObject: Structure) {
+        const objectIndex = this.interactiveObjects.findIndex(object => object === disposedObject);
+        if (objectIndex === -1) return;
+        this.interactiveObjects.splice(objectIndex, 1);
     }
 }
