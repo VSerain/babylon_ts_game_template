@@ -12,6 +12,7 @@ export interface StoreList {
 }
 
 export interface WeaponOwner {
+    name: string,
     directionVector: BABYLON.Vector3
     toTouch(touchable: Touchable, pickInfo: BABYLON.PickingInfo): void
 }

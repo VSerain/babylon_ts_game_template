@@ -20,6 +20,8 @@ export function applyController(structure: Structure, loader: Loader) {
 }
 
 export function getStructureByMesh(mesh: BABYLON.AbstractMesh): Structure | null {
+    if (mesh.isDisposed()) return null;
+
     if (mesh.metadata && mesh.metadata.instance) return mesh.metadata.instance as Structure;
 
     if (mesh.parent && mesh.parent instanceof BABYLON.AbstractMesh) return getStructureByMesh(mesh.parent as BABYLON.AbstractMesh);
@@ -28,6 +30,8 @@ export function getStructureByMesh(mesh: BABYLON.AbstractMesh): Structure | null
 }
 
 export function getTouchableByMesh(mesh: BABYLON.AbstractMesh): Touchable | null {
+    if (mesh.isDisposed()) return null;
+
     const structure = getStructureByMesh(mesh); 
     if (structure) return structure;
 

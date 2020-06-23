@@ -5,6 +5,7 @@ import EntitiesController from "app/entities/index";
 import SceneryController from "app/scenery/index";
 
 import { WeaponOwner, Touchable } from 'app/entities/interfaces';
+
 export default class Structure {
     require = {
         playerController: false,
@@ -13,12 +14,14 @@ export default class Structure {
         sceneryController: false,
     }
 
+    private _mesh: BABYLON.Mesh;
+
     name: string = (new Date().getTime() + Math.random() * Math.random()).toString();
 
-    constructor(protected mesh: BABYLON.Mesh, data: any = {}) {
+    constructor(mesh: BABYLON.Mesh, data: any = {}) {
+        this.mesh = mesh;
         this.name = data.name || this.name;
-        if (!this.mesh.metadata) this.mesh.metadata = {};
-        this.mesh.metadata.instance = this;
+ 
     }
 
     load(){}
@@ -55,15 +58,27 @@ export default class Structure {
     }
 
     getMesh() {
-        return this.mesh;
+        return this._mesh;
+    }
+
+    protected set mesh(mesh: BABYLON.Mesh) {
+        this._mesh = mesh;
+        if (!this.mesh.metadata) this.mesh.metadata = {};
+        this.mesh.metadata.instance = this;
+    }
+    protected get mesh() {
+        return this._mesh;
     }
 
     wasTouched(by: Structure, at: BABYLON.Mesh, pickInfo: BABYLON.PickingInfo, owner: WeaponOwner): boolean {
-        console.log(by, owner);
         return true;
     }
 
     toTouch(touchable: Touchable, pickInfo: BABYLON.PickingInfo) {
 
+    }
+
+    dispose(){
+        this.mesh.dispose();
     }
 }

@@ -12,6 +12,7 @@ export default class FPSCamera extends BABYLON.UniversalCamera implements Toucha
     inputManager: InputManager;
     body: Body;
     jumpHeight: number = 4;
+    life: number = 4;
 
     private _lastY: number = 0;
     private _lastStructureCollide: Structure;
@@ -41,7 +42,8 @@ export default class FPSCamera extends BABYLON.UniversalCamera implements Toucha
             "onPlayerCollideBottom",
             "onPlayerCollideTop",
             "onPlayerEveryCollide",
-            "player.move.status.changed"
+            "player.move.status.changed",
+            "player.dead",
         );
         this.onCollide = (collidedMesh) => this._onCollide(collidedMesh);
 
@@ -165,11 +167,20 @@ export default class FPSCamera extends BABYLON.UniversalCamera implements Toucha
     }
 
     wasTouched(by: Structure, at: BABYLON.Mesh, pickInfo: BABYLON.PickingInfo, owner: WeaponOwner): boolean {
-        console.log(at)
+        console.log(`Player is touch at ${at.name} by ${owner.name}`);
+        this.life--;
+        if (this.life === 0) {
+            this.dead();
+        }
         return true;
     }
 
     toTouch(touchable: Touchable, pickInfo: BABYLON.PickingInfo) {
-        console.log(touchable);
+    }
+
+    dead() {
+        console.log("you'r dead");
+        eventManager.call("player.dead");
+        this.life = 4;
     }
 }

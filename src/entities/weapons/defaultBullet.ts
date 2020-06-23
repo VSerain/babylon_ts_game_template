@@ -15,13 +15,15 @@ export default class DefaultBullet extends Structure {
     node: BABYLON.TransformNode;
     animatable: BABYLON.Animatable;
     ray: BABYLON.Ray;
-    speed: number = 10;
+    speed: number = 100;
     maxDistLife: number = 100;
     sizeImpact: BABYLON.Vector3 = new BABYLON.Vector3(0.08, 0.08, 0.08);
     lastPosition: BABYLON.Vector3 = new BABYLON.Vector3();
     impactMaterial: BABYLON.Material;
     
     parent: Weapon;
+
+    particleSystem: BABYLON.ParticleSystem;
 
     constructor() {
         super(new BABYLON.Mesh("tmpMesh"), {});
@@ -48,11 +50,6 @@ export default class DefaultBullet extends Structure {
         this.initMaterial();
     }
 
-    playerTouched(partName: string, mesh: BABYLON.Mesh) {
-        console.log("Player as touch at " + partName + " by bullet " + this.name);
-        this.dispose();
-    }
-
     fire() {
         this.entries = this.entitiesController.store.getEntries(name);
         this.node = this.entries.rootNodes[0];
@@ -75,6 +72,8 @@ export default class DefaultBullet extends Structure {
         ]);
 
         this.mesh.animations.push(fireAnimation);
+
+        this.generatePatricleSystem();
         
         this.animatable = this.sceneryController.scene.beginDirectAnimation(this.mesh, [fireAnimation] , 0 , this.maxDistLife);
 
@@ -91,7 +90,16 @@ export default class DefaultBullet extends Structure {
     checkColide() {
         const directionVector = this.position.subtract(this.lastPosition);
         const ray = new BABYLON.Ray(this.lastPosition, directionVector.clone().normalize(), directionVector.length());
-        const pickInfo = this.sceneryController.scene.pickWithRay(ray, (mesh) => getTouchableByMesh(mesh) ? true : false);
+        const pickInfo = this.sceneryController.scene.pickWithRay(ray, (mesh) => {
+            if (mesh === this.mesh) return false;
+            const touchable = getTouchableByMesh(mesh);
+
+            if (this.parent === touchable) return false;
+            if (this.parent.owner as any === touchable) return false;
+
+            return true;
+        });
+     
         // debugRay(ray, this.sceneryController.scene);
 
         if (!pickInfo || !pickInfo.pickedMesh) return;
@@ -109,11 +117,11 @@ export default class DefaultBullet extends Structure {
             this.dispose();
             return;
         }
-
-        console.log(touchable, pickInfo);
     }
 
     explode(positionImpact: BABYLON.Vector3, faceId: number, structureMesh: BABYLON.AbstractMesh) {
+        if (structureMesh.isDisposed()) return;
+
         const impact = BABYLON.MeshBuilder.CreateDecal("decal", structureMesh, {
             position: positionImpact,
             normal: structureMesh.getFacetNormal(faceId).scale(-1), 
@@ -127,7 +135,59 @@ export default class DefaultBullet extends Structure {
 
     dispose() {
         if (this.animatable) this.animatable.stop();
-        this.mesh.dispose();
         this.entitiesController.disposeEntity(this);
+        this.particleSystem.stop();
+        this.particleSystem.dispose();
+        super.dispose();
+    }
+
+    generatePatricleSystem() {
+        this.particleSystem = new BABYLON.ParticleSystem("particles", 12000, this.sceneryController.scene);
+
+        //Texture of each particle
+        this.particleSystem.particleTexture = new BABYLON.Texture("assets/images/textures/flare.png", this.sceneryController.scene);
+    
+        // Where the particles come from
+        this.particleSystem.emitter = this.mesh; // the starting object, the emitter
+        this.particleSystem.minEmitBox = new BABYLON.Vector3(0, -1, 0); // Starting all from
+        this.particleSystem.maxEmitBox = new BABYLON.Vector3(0, 1, 0); // To...
+    
+        // Colors of all particles
+        this.particleSystem.color1 = new BABYLON.Color4(0.7, 0.8, 1.0, 1.0);
+        this.particleSystem.color2 = new BABYLON.Color4(0.2, 0.5, 1.0, 1.0);
+        this.particleSystem.colorDead = new BABYLON.Color4(0, 0, 0.2, 0.0);
+    
+        // Size of each particle (random between...
+        this.particleSystem.minSize = 0.1;
+        this.particleSystem.maxSize = 0.2;
+    
+        // Life time of each particle (random between...
+        this.particleSystem.minLifeTime = 0.01;
+        this.particleSystem.maxLifeTime = 0.1;
+    
+        // Emission rate
+        this.particleSystem.emitRate = 6000;
+    
+        // Blend mode : BLENDMODE_ONEONE, or BLENDMODE_STANDARD
+        this.particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
+    
+        // Set the gravity of all particles
+        this.particleSystem.gravity = new BABYLON.Vector3(0, 0, 0);
+    
+        // Direction of each particle after it has been emitted
+        this.particleSystem.direction1 = this.ray.direction.scale(-1);
+    
+        // Angular speed, in radians
+        this.particleSystem.minAngularSpeed = 0;
+        this.particleSystem.maxAngularSpeed = Math.PI;
+    
+        // Speed
+        this.particleSystem.minEmitPower = 5;
+        this.particleSystem.maxEmitPower = 10;
+        this.particleSystem.updateSpeed = 0.001;
+    
+        // Start the particle system
+        this.particleSystem.start();
+    
     }
 }

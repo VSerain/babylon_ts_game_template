@@ -1,13 +1,13 @@
 import Structure from "app/shared/structure";
 import * as BABYLON from "babylonjs";
-import { WeaponOwner, Weapon } from "../interfaces";
-import DefaultWeapon from "../weapons/defaultWeapon";
+import { WeaponOwner, Touchable } from "app/entities/interfaces";
+import DefaultWeapon from "app/entities/weapons/defaultWeapon";
 
 export const name = "default-turret";
 
 export const glb = "turret.glb";
 
-export default class DefaultTurret extends Structure implements WeaponOwner {
+export default class DefaultTurret extends Structure implements WeaponOwner, Touchable {
     entries: BABYLON.InstantiatedEntries;
     node: BABYLON.TransformNode;
     directionVector: BABYLON.Vector3 = new BABYLON.Vector3(1,0,0);
@@ -15,10 +15,12 @@ export default class DefaultTurret extends Structure implements WeaponOwner {
     weaponName: string = "default-weapon";
 
     lastFire: number = 0;
-    timeBeetwenFire: number = 1;
+    timeBeetwenFire: number = 0.8;
+
+    life: number = 3;
 
     constructor() {
-        super(new BABYLON.Mesh("tmpMesh"), {});
+        super(new BABYLON.Mesh("tmpMesh"), {name: "DefaultTurret"});
         this.require.entitiesController = true;
         this.require.playerController = true;
     }
@@ -36,7 +38,6 @@ export default class DefaultTurret extends Structure implements WeaponOwner {
         this.weapon.position = new BABYLON.Vector3(-1.2, 0, 0);
         this.weapon.rotation = new BABYLON.Vector3();
         this.weapon.computeAnimation(this.weapon.node);
-        console.log(this.weapon);
     }
 
     renderLoop() {
@@ -50,5 +51,23 @@ export default class DefaultTurret extends Structure implements WeaponOwner {
     fire() {
         this.lastFire = new Date().getTime();
         this.weapon.fire();
+    }
+
+
+    wasTouched(by: Structure, at: BABYLON.Mesh, pickInfo: BABYLON.PickingInfo, owner: WeaponOwner): boolean {
+        console.log(`DefaultTurret is touch at ${at.name} by ${owner.name}`);
+        this.life--;
+        if (this.life === 0) {
+            this.dispose();
+        }
+        return true;
+    }
+
+    toTouch(touchable: Touchable, pickInfo: BABYLON.PickingInfo) {
+    }
+
+    dispose() {
+        this.entitiesController.disposeEntity(this);
+        super.dispose();
     }
 }
