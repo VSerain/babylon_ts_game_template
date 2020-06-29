@@ -18,9 +18,9 @@ export default class Store {
         });
     }
 
-    getEntries(name: string) {
+    getEntries(name: string, firstPartName: string = "Clone of ", cloneMaterials: boolean = false) {
         if (!this.storedContainer[name] || !this.storedContainer[name].loaded) throw new Error("Assets not found or not loaded");
         const container = this.storedContainer[name].container as BABYLON.AssetContainer;
-        return container.instantiateModelsToScene()
+        return container.instantiateModelsToScene((name) => firstPartName + name, cloneMaterials)
     }
 }

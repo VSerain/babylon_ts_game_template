@@ -1,6 +1,6 @@
 import * as BABYLON from "babylonjs"
 import eventManager from "app/shared/eventManager";
-import Structure from "app/shared/structure";
+import BaseStructure from "app/shared/object-structure";
 import * as structureHelpers from "app/shared/structure-helpers";
 
 import Loader from "app/loader/index";
@@ -17,7 +17,7 @@ export default class ObjectsController {
 
     types: Array<any> = [];
 
-    interactiveObjects: Array<Structure> = [];
+    interactiveObjects: Array<BaseStructure> = [];
 
     constructor(private loader: Loader) {
         this.loader.objectsController = this;
@@ -36,7 +36,7 @@ export default class ObjectsController {
     initTypes() {
         this.types.push(...Buttons);
         this.types.push(...Spawners);
-        console.log(Spawners);
+
         this.types.forEach((module) => {
             this.loader.addObjectsType(module.name);
         });
@@ -55,7 +55,7 @@ export default class ObjectsController {
 
         if (!mesh.metadata) mesh.metadata = {};
         
-        const instance = new type.default(mesh, data) as Structure;
+        const instance = new type.default(mesh, data) as BaseStructure;
 
         structureHelpers.applyController(instance, this.loader);
 
@@ -64,7 +64,7 @@ export default class ObjectsController {
         if (this.isLoad()) instance.load();
     }
 
-    disposeObject(disposedObject: Structure) {
+    disposeObject(disposedObject: BaseStructure) {
         const objectIndex = this.interactiveObjects.findIndex(object => object === disposedObject);
         if (objectIndex === -1) return;
         this.interactiveObjects.splice(objectIndex, 1);

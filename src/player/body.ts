@@ -2,7 +2,7 @@ import * as BABYLON from "babylonjs";
 import eventManager from "app/shared/eventManager";
 
 import FPSCamera from "./fpsCamera";
-import Structure from "app/shared/structure";
+import BaseStructure from "app/shared/base-structure";
 
 export default class Body {
     head: BABYLON.Mesh;
@@ -13,7 +13,7 @@ export default class Body {
     legRight: BABYLON.Mesh;
 
     colidedMeshes: Array<BABYLON.Mesh> = [];
-    structuresColided: Array<Structure> = [];
+    structuresColided: Array<BaseStructure> = [];
 
     defaultWeaponHandRotation: BABYLON.Vector3 = new BABYLON.Vector3(-Math.PI / 2, 0,0);
 
@@ -32,12 +32,12 @@ export default class Body {
             this.handRight.rotation = new BABYLON.Vector3();
         });
 
-        eventManager.on("player.body.structuresColided.add", { layer: 1 }, (callbackStop, structure: Structure) => {
+        eventManager.on("player.body.structuresColided.add", { layer: 1 }, (callbackStop, structure: BaseStructure) => {
             this.structuresColided.push(structure);
             callbackStop();
         });
 
-        eventManager.on("player.body.structuresColided.remove", { layer: 1 }, (callbackStop, structure: Structure) => {
+        eventManager.on("player.body.structuresColided.remove", { layer: 1 }, (callbackStop, structure: BaseStructure) => {
             callbackStop();
             const index = this.structuresColided.findIndex(struct => struct === structure );
             if (index === -1) return;
@@ -48,9 +48,9 @@ export default class Body {
     public checkColisions() {
         this.structuresColided.forEach(structure => {
             this.colidedMeshes.forEach(partOfBody => {
-                if (partOfBody.intersectsMesh(structure.getMesh())) {
-                    eventManager.call("player.body.colide", [partOfBody.name, partOfBody, structure]);
-                }
+                // if (partOfBody.intersectsMesh(structure.getMesh())) {
+                    // eventManager.call("player.body.colide", [partOfBody.name, partOfBody, structure]);
+                // }
             });
         });
     }

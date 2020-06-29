@@ -4,7 +4,6 @@ import * as BABYLON from "babylonjs";
 import Loader from "app/loader/index";
 import UI from "./ui/index";
 import FPSCamera from "./fpsCamera";
-import Structure from "app/shared/structure";
 import eventManager from "app/shared/eventManager";
 
 export default class PlayerController {

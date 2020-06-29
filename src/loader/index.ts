@@ -230,7 +230,7 @@ export default class Loader {
 
     __dev__spawnEnemiesSpawner() {
         const s = BABYLON.BoxBuilder.CreateBox("enemiesSpawner", {}, this.scene);
-        s.position = new BABYLON.Vector3(10,1,10);
+        s.position = new BABYLON.Vector3(10,0,10);
         s.metadata = {
             gltf: {
                 extras: {

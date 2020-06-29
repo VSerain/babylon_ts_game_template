@@ -3,7 +3,7 @@ import * as BABYLON from "babylonjs";
 import Loader from "app/loader/index";
 import Store from "./store";
 import eventManager from "app/shared/eventManager";
-import Structure from "app/shared/structure";
+import EntityStructure from "app/shared/entity-structure";
 import * as structureHelpers from "app/shared/structure-helpers";
 
 import Weapons from "./weapons/index";
@@ -19,7 +19,7 @@ export default class EntitiesController {
 
     types: Array<any> = [];
 
-    entities: Array<Structure> = [];
+    entities: Array<EntityStructure> = [];
 
     constructor(private loader: Loader) {
         this.loader.entitiesController = this;
@@ -60,18 +60,18 @@ export default class EntitiesController {
 
         if (!mesh.metadata) mesh.metadata = {};
         
-        const instance = new type.default(mesh, data) as Structure;
+        const instance = new type.default(mesh, data) as EntityStructure;
 
         structureHelpers.applyController(instance, this.loader);
 
         this.entities.push(instance);
     }
 
-    createEntities(entityName:string) {
+    createEntities(entityName: string) {
         const type = this.types.find((type) => type.name == entityName);
         if (!type) throw new Error(`entity type ${type} was not found`);
 
-        const instance = new type.default() as Structure;
+        const instance = new type.default() as EntityStructure;
 
         structureHelpers.applyController(instance, this.loader);
 
@@ -81,7 +81,7 @@ export default class EntitiesController {
         return instance;
     }
 
-    disposeEntity(disposedEntity: Structure) {
+    disposeEntity(disposedEntity: EntityStructure) {
         const entityIndex = this.entities.findIndex(entity => entity === disposedEntity);
         if (entityIndex === -1) return;
         this.entities.splice(entityIndex, 1);

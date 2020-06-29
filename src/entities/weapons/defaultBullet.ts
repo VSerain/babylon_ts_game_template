@@ -1,6 +1,6 @@
 import * as BABYLON from "babylonjs";
 
-import Structure from "app/shared/structure";
+import EntityStructure from "app/shared/entity-structure";
 import { getTouchableByMesh } from "app/shared/structure-helpers";
 import { debugRay } from "app/shared/debug-helpers";
 
@@ -10,12 +10,11 @@ export const name = "default-bullet";
 
 export const glb = "bullet.glb";
 
-export default class DefaultBullet extends Structure {
+export default class DefaultBullet extends EntityStructure {
     entries: BABYLON.InstantiatedEntries;
-    node: BABYLON.TransformNode;
     animatable: BABYLON.Animatable;
     ray: BABYLON.Ray;
-    speed: number = 100;
+    speed: number = 240;
     maxDistLife: number = 100;
     sizeImpact: BABYLON.Vector3 = new BABYLON.Vector3(0.08, 0.08, 0.08);
     lastPosition: BABYLON.Vector3 = new BABYLON.Vector3();
@@ -24,16 +23,14 @@ export default class DefaultBullet extends Structure {
     parent: Weapon;
 
     constructor() {
-        super(new BABYLON.Mesh("tmpMesh"), {});
+        super();
         this.require.entitiesController = true;
         this.require.sceneryController = true;
     }
 
-    get position() {
-        return this.mesh.position;
-    }
-    set position(position) {
-        this.mesh.position = position;
+    get position() {return super.position}
+    set position(position: BABYLON.Vector3) {
+        super.position = position
         this.lastPosition = position.clone();
     }
 
@@ -51,11 +48,9 @@ export default class DefaultBullet extends Structure {
     fire() {
         this.entries = this.entitiesController.store.getEntries(name);
         this.node = this.entries.rootNodes[0];
-        this.mesh = this.node.getChildMeshes()[0] as BABYLON.Mesh;
-        this.mesh.parent = null;
-        this.mesh.scaling = new BABYLON.Vector3(0.04, 0.04, 0.04);
-        this.mesh.setAbsolutePosition(this.ray.origin);
-        this.lastPosition = this.mesh.position;
+        this.node.scaling = new BABYLON.Vector3(0.04, 0.04, 0.04);
+        this.node.setAbsolutePosition(this.ray.origin);
+        this.lastPosition = this.node.position;
 
         const fireAnimation = new BABYLON.Animation("move-with-ray-fire", "position", this.speed, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
         fireAnimation.setKeys([
@@ -69,15 +64,15 @@ export default class DefaultBullet extends Structure {
             }
         ]);
 
-        this.mesh.animations.push(fireAnimation);
+        this.node.animations.push(fireAnimation);
 
-        this.animatable = this.sceneryController.scene.beginDirectAnimation(this.mesh, [fireAnimation] , 0 , this.maxDistLife);
+        this.animatable = this.sceneryController.scene.beginDirectAnimation(this.node, [fireAnimation] , 0 , this.maxDistLife);
 
         this.animatable.onAnimationEnd = () => this.dispose();
     }
 
     renderLoop() {
-        if (!this.animatable || this.mesh.isDisposed()) return;
+        if (!this.animatable || this.node.isDisposed()) return;
         this.checkColide();
 
         this.lastPosition = this.position.clone();
@@ -87,10 +82,11 @@ export default class DefaultBullet extends Structure {
         const directionVector = this.position.subtract(this.lastPosition);
         const ray = new BABYLON.Ray(this.lastPosition, directionVector.clone().normalize(), directionVector.length());
         const pickInfo = this.sceneryController.scene.pickWithRay(ray, (mesh) => {
-            if (mesh === this.mesh) return false;
-            const touchable = getTouchableByMesh(mesh);
+            if (mesh === this.node) return false;
+            const touchable = getTouchableByMesh(mesh) as Touchable;
 
-            if (this.parent === touchable) return false;
+            if (!touchable) return false;
+            if (this.parent === touchable as any) return false;
             if (this.parent.owner as any === touchable) return false;
 
             return true;

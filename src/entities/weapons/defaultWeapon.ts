@@ -1,6 +1,6 @@
 import * as BABYLON from "babylonjs";
 
-import Structure from "app/shared/structure";
+import EntityStructure from "app/shared/entity-structure";
 
 import DefaultBullet from "./defaultBullet";
 import { WeaponOwner } from 'app/entities/interfaces';
@@ -9,14 +9,14 @@ export const name = "default-weapon";
 
 export const glb = "weapon.glb"
 
-export default class DefaultWeapon extends Structure {
+export default class DefaultWeapon extends EntityStructure {
     weaponName: string = name;
     bulletName: string = "default-bullet";
 
     entries: BABYLON.InstantiatedEntries;
-    node: BABYLON.TransformNode;
 
     owner: WeaponOwner;
+    parentMesh: BABYLON.Mesh;
     isAttached: boolean = false;
 
     animations: Array<any> = [];
@@ -24,7 +24,7 @@ export default class DefaultWeapon extends Structure {
     currentAnimatable: BABYLON.Animatable;
 
     constructor() {
-        super(new BABYLON.Mesh("tmpMesh"), {});
+        super();
         this.require.playerController = true;
         this.require.entitiesController = true;
         this.require.sceneryController = true;
@@ -34,22 +34,27 @@ export default class DefaultWeapon extends Structure {
         this.isAttached = true;
         this.entries = this.entitiesController.store.getEntries(name);
         this.node = this.entries.rootNodes[0];
-        this.node.parent = parentMesh;
+        this.parentMesh = parentMesh;
         this.owner = owner;
-        
-        this.node.position = new BABYLON.Vector3(0, -0.6 , -0.1);
-        this.node.rotation = new BABYLON.Vector3(0, Math.PI / 2,  Math.PI / 2);
-        
+
+        this.sceneryController.scene.registerBeforeRender(this.beforeRender.bind(this));
+
         // @TODO remove me
-        this.node.scaling = new BABYLON.Vector3(0.08,0.08,0.08);
         this.computeAnimation(this.node);
+    }
+
+    beforeRender() {
+        if (!this.parentMesh) return;
+        this.position = this.parentMesh.absolutePosition.clone();
+        this.node.rotationQuaternion = this.parentMesh.absoluteRotationQuaternion;
     }
 
     detachToParent() {
         this.isAttached = false;
         this.node.animations = [];
-        this.node.parent = null;
         this.node.dispose();
+        this.sceneryController.scene.unregisterBeforeRender(this.beforeRender.bind(this))
+
     }
 
     onParentMoveStatusChange(status: string) {
@@ -63,8 +68,8 @@ export default class DefaultWeapon extends Structure {
 
     async fire() {
         if (!this.isAttached) return;
-
-        const directionRay = new BABYLON.Ray(this.absolutePosition.clone().add(new BABYLON.Vector3(0, 0.2,0)), this.owner.directionVector, 1);
+        // Not use position because there is relative whit parent position
+        const directionRay = new BABYLON.Ray(this.absolutePosition.add(new BABYLON.Vector3(0, 0.2,0)), this.owner.directionVector, 1);
         const bullet = this.entitiesController.createEntities("default-bullet") as DefaultBullet;
         bullet.parent = this;
         bullet.ray = directionRay;
@@ -144,32 +149,5 @@ export default class DefaultWeapon extends Structure {
             speed: 3,
             animation: fireAnimation
         });
-
-
-    }
-
-    get position() {
-        return this.node.position;
-    }
-    set position(position) {
-        this.node.position = position;
-    }
-
-    get absolutePosition() {
-        return this.node.getAbsolutePosition();
-    }
-
-    get rotation() {
-        return this.node.rotation;
-    }
-    set rotation(rotation) {
-        this.node.rotation = rotation;
-    }
-
-    get scaling() {
-        return this.node.scaling;
-    }
-    set scaling(scaling) {
-        this.node.scaling = scaling;
     }
 }

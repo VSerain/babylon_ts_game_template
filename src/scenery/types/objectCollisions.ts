@@ -1,9 +1,9 @@
 import * as BABYLON from "babylonjs";
-import Structure from "app/shared/structure";
+import ObjectStructure from "app/shared/object-structure";
 
 export const name = "object-collisions";
 
-export default class ObjectPhysics extends Structure {
+export default class ObjectPhysics extends ObjectStructure {
     constructor(protected mesh: BABYLON.Mesh, data: any = {}) {
         super(mesh, data);
         this.mesh.physicsImpostor = new BABYLON.PhysicsImpostor(

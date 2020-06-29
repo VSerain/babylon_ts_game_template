@@ -1,10 +1,12 @@
 import * as BABYLON from "babylonjs";
 import Loader from "app/loader/index";
-import Structure from "./structure";
 import { Touchable } from "app/entities/interfaces";
 import FPSCamera from "app/player/fpsCamera";
 
-export function applyController(structure: Structure, loader: Loader) {
+import ObjectStructure from "./object-structure";
+import BaseStructure from "./base-structure";
+
+export function applyController(structure: BaseStructure, loader: Loader) {
     if (structure.require.playerController) {
         structure.playerController = loader.playerController;
     }
@@ -19,12 +21,12 @@ export function applyController(structure: Structure, loader: Loader) {
     }
 }
 
-export function getStructureByMesh(mesh: BABYLON.AbstractMesh): Structure | null {
-    if (mesh.isDisposed()) return null;
+export function getStructureByNode(node: BABYLON.Node): BaseStructure | null{
+    if (node.isDisposed()) return null;
+    
+    if (node.metadata && node.metadata.instance) return node.metadata.instance as BaseStructure;
 
-    if (mesh.metadata && mesh.metadata.instance) return mesh.metadata.instance as Structure;
-
-    if (mesh.parent && mesh.parent instanceof BABYLON.AbstractMesh) return getStructureByMesh(mesh.parent as BABYLON.AbstractMesh);
+    if (node.parent) return getStructureByNode(node.parent);
 
     return null;
 }
@@ -32,8 +34,8 @@ export function getStructureByMesh(mesh: BABYLON.AbstractMesh): Structure | null
 export function getTouchableByMesh(mesh: BABYLON.AbstractMesh): Touchable | null {
     if (mesh.isDisposed()) return null;
 
-    const structure = getStructureByMesh(mesh); 
-    if (structure) return structure;
+    const structure = getStructureByNode(mesh); 
+    if (structure && structure.isTouchable) return structure as any;
 
     if (mesh.name.startsWith("player")) {
         return mesh._scene.getCameraByName("player-camera") as FPSCamera;
@@ -42,7 +44,7 @@ export function getTouchableByMesh(mesh: BABYLON.AbstractMesh): Touchable | null
     return null;
 }
 
-export interface StructureConstructor {
-    new(mesh: BABYLON.Mesh, data: any): Structure;
-    (): Structure;
+export interface ObjectStructureConstructor {
+    new(mesh: BABYLON.Mesh, data: any): ObjectStructure;
+    (): ObjectStructure;
 }

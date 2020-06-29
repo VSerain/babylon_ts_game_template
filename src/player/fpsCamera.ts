@@ -6,7 +6,7 @@ import InputManager from "app/player/inputs/index";
 import Body from "app/player/body";
 
 import eventManager from "app/shared/eventManager";
-import Structure from "app/shared/structure";
+import BaseStructure from "app/shared/base-structure";
 
 export default class FPSCamera extends BABYLON.UniversalCamera implements Touchable, WeaponOwner {
     inputManager: InputManager;
@@ -15,9 +15,11 @@ export default class FPSCamera extends BABYLON.UniversalCamera implements Toucha
     life: number = 4;
 
     private _lastY: number = 0;
-    private _lastStructureCollide: Structure;
+    private _lastStructureCollide: BaseStructure;
     weapons: Array<Weapon> = [];
     _currentWeapon: Weapon;
+
+    isTouchable = true;
 
     constructor(name: string, position: BABYLON.Vector3, scene: BABYLON.Scene) {
         super(name, position, scene);
@@ -63,14 +65,14 @@ export default class FPSCamera extends BABYLON.UniversalCamera implements Toucha
     }
 
     private _onCollide(collidedMesh: BABYLON.AbstractMesh) {
-        const structure = structureHelpers.getStructureByMesh(collidedMesh);
+        const structure = structureHelpers.getStructureByNode(collidedMesh);
         if (!structure || structure === this._lastStructureCollide) return;
         this._lastStructureCollide = structure;
         eventManager.call("onPlayerEveryCollide", [structure]);
-        if (structure.absolutePosition.y < this.position.y) {
+        if (structure.position.y < this.position.y) {
             eventManager.call("onPlayerCollideBottom", [structure]);
         }
-        else if (structure.absolutePosition.y >= this.position.y + this.ellipsoid.y) {
+        else if (structure.position.y >= this.position.y + this.ellipsoid.y) {
             eventManager.call("onPlayerCollideTop", [structure]);
         }
         else {
@@ -166,7 +168,7 @@ export default class FPSCamera extends BABYLON.UniversalCamera implements Toucha
         if (this.weapons.length === 1) this.currentWeapon = weapon;
     }
 
-    wasTouched(by: Structure, at: BABYLON.Mesh, pickInfo: BABYLON.PickingInfo, owner: WeaponOwner): boolean {
+    wasTouched(by: BaseStructure, at: BABYLON.Mesh, pickInfo: BABYLON.PickingInfo, owner: WeaponOwner): boolean {
         console.log(`Player is touch at ${at.name} by ${owner.name}`);
         this.life--;
         if (this.life === 0) {

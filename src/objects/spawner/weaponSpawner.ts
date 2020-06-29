@@ -3,11 +3,11 @@ import * as BABYLON from "babylonjs"
 import { MINIMAL_DIST_EVENT } from "app/objects/constants";
 import eventManager from "app/shared/eventManager";
 
-import Structure from "app/shared/structure";
+import BaseStructure from "app/shared/object-structure";
 
 export const name = "weapon-spawner";
 
-export default class WeaponSpawner extends Structure {
+export default class WeaponSpawner extends BaseStructure {
 
     private weaponName: string;
     private eventActive: boolean = false;
@@ -51,8 +51,7 @@ export default class WeaponSpawner extends Structure {
         this.representationNode = entries.rootNodes[0];
         this.representationNode.parent = this.mesh;
         this.representationNode.position = new BABYLON.Vector3(0, 1, 0);
-        this.representationNode.rotation = new BABYLON.Vector3(0, Math.PI, 0);
-        this.representationNode.scaling = new BABYLON.Vector3(0.2,0.2,0.2); // @TODO: Remove me
+        this.representationNode.rotation = new BABYLON.Vector3(0, 0, Math.PI/2);
 
         const animation = new BABYLON.Animation("rotate0", "rotation.y", 1, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
         animation.setKeys([

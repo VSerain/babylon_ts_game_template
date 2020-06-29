@@ -1,13 +1,10 @@
 import * as BABYLON from "babylonjs"
 
-import { MINIMAL_DIST_EVENT } from "app/objects/constants";
-import eventManager from "app/shared/eventManager";
-
-import Structure from "app/shared/structure";
+import BaseStructure from "app/shared/object-structure";
 
 export const name = "enemies-spawner";
 
-export default class WeaponSpawner extends Structure {
+export default class WeaponSpawner extends BaseStructure {
 
     enemiesNames: Array<string> = [];
     enemiesQuantity: number = 1;
