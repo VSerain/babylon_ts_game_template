@@ -31,7 +31,7 @@ export default class Game {
         if (!this.canvas) throw new Error(`${this.canvasId} is not found in DOM`);
 
         this.canvas.addEventListener("click", () => {
-            // this.canvas.requestPointerLock(); // Lock pointer to game
+            this.canvas.requestPointerLock(); // Lock pointer to game
         });
 
         this.attachCallback();
