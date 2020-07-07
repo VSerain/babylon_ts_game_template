@@ -16,7 +16,7 @@ export default class DefaultWeapon extends EntityStructure {
     entries: BABYLON.InstantiatedEntries;
 
     owner: WeaponOwner;
-    parentMesh: BABYLON.Mesh;
+    parentNode: BABYLON.TransformNode;
     isAttached: boolean = false;
 
     animations: Array<any> = [];
@@ -30,31 +30,21 @@ export default class DefaultWeapon extends EntityStructure {
         this.require.sceneryController = true;
     }
 
-    attachToParent(parentMesh: BABYLON.Mesh, owner: WeaponOwner) {
+    attachToParent(parentNode: BABYLON.TransformNode, owner: WeaponOwner) {
         this.isAttached = true;
-        this.entries = this.entitiesController.store.getEntries(name);
+        this.entries = this.entitiesController.store.getEntries(name, name);
         this.node = this.entries.rootNodes[0];
-        this.parentMesh = parentMesh;
+        this.parentNode = parentNode;
         this.owner = owner;
-
-        this.sceneryController.scene.registerBeforeRender(this.beforeRender.bind(this));
 
         // @TODO remove me
         this.computeAnimation(this.node);
-    }
-
-    beforeRender() {
-        if (!this.parentMesh) return;
-        this.position = this.parentMesh.absolutePosition.clone();
-        this.node.rotationQuaternion = this.parentMesh.absoluteRotationQuaternion;
     }
 
     detachToParent() {
         this.isAttached = false;
         this.node.animations = [];
         this.node.dispose();
-        this.sceneryController.scene.unregisterBeforeRender(this.beforeRender.bind(this))
-
     }
 
     onParentMoveStatusChange(status: string) {
@@ -121,21 +111,21 @@ export default class DefaultWeapon extends EntityStructure {
             animation: walkAnimation
         });
 
-        const fireAnimation = new BABYLON.Animation("fire", "rotation.z", 3, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+        const fireAnimation = new BABYLON.Animation("fire", "rotation.x", 3, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
         const fireKey = []; 
 
         fireKey.push(
             {
                 frame: 0,
-                value: node.rotation.z
+                value: node.rotation.x
             },
             {
                 frame: 1,
-                value: node.rotation.z - Math.PI / 12
+                value: node.rotation.x - Math.PI / 12
             },
             {
                 frame: 2,
-                value: node.rotation.z
+                value: node.rotation.x
             }
         );
         fireAnimation.setKeys(fireKey);

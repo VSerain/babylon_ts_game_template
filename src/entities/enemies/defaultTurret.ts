@@ -6,7 +6,7 @@ import BaseStucture from "app/shared/base-structure";
 
 export const name = "default-turret";
 
-export const glb = "turret.glb";
+export const glb = "testMixamo.glb";
 
 export default class DefaultTurret extends EntityStructure implements WeaponOwner, Touchable {
     entries: BABYLON.InstantiatedEntries;
@@ -17,13 +17,14 @@ export default class DefaultTurret extends EntityStructure implements WeaponOwne
     hand: BABYLON.Mesh;
 
     lastFire: number = 0;
-    timeBeetwenFire: number = 0.8;
+    timeBeetwenFire: number = 2;
 
     life: number = 3;
 
     constructor() {
         super({ name: "DefaultTurret" });
         this.require.entitiesController = true;
+        this.require.sceneryController = true;
         this.require.playerController = true;
     }
 
@@ -31,19 +32,17 @@ export default class DefaultTurret extends EntityStructure implements WeaponOwne
     load() {
         this.entries = this.entitiesController.store.getEntries(name, `${name} `);
         this.node = this.entries.rootNodes[0];
-        console.log(this.entries);
         this.weapon = this.entitiesController.createEntities(this.weaponName) as any;
+        
+        const skeleton = this.entries.skeletons[0];
+        this.weapon.attachToParent(this.node, this);
+        const weaponNode = this.weapon.getNode();
 
-        this.hand = this.node.getChildMeshes(false, (n => n.name.includes("arm")))[0] as BABYLON.Mesh;
-        console.log(this.hand);
+        this.entries.animationGroups[0].play(true);
 
-        this.hand.setPivotPoint(new BABYLON.Vector3(0, 0.3, 0));
-        this.hand.rotate(new BABYLON.Vector3(0,0,1), Math.PI/2, BABYLON.Space.WORLD);
+        weaponNode.attachToBone(skeleton.bones[11], this.node);
+        this.weapon.computeAnimation(this.weapon.getNode());
 
-        this.weapon.attachToParent(this.hand, this);
-
-        this.weapon.position = new BABYLON.Vector3(1.2, 3, 0);
-        // this.weapon.computeAnimation(this.weapon.getNode());
     }
 
     renderLoop() {
@@ -58,7 +57,6 @@ export default class DefaultTurret extends EntityStructure implements WeaponOwne
         this.lastFire = new Date().getTime();
         // this.weapon.fire();
     }
-
 
     wasTouched(by: BaseStucture, at: BABYLON.Mesh, pickInfo: BABYLON.PickingInfo, owner: WeaponOwner): boolean {
         console.log(`DefaultTurret is touch at ${at.name} by ${owner.name}`);

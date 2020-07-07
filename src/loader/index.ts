@@ -236,8 +236,8 @@ export default class Loader {
                 extras: {
                     type: "enemies-spawner",
                     enemiesNames: "default-turret",
-                    enemiesQuantity: 1,
-                    delayBetweenSpawn: 3,
+                    enemiesQuantity: 20,
+                    delayBetweenSpawn: 0,
                 }
             }
         };

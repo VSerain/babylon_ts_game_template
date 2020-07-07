@@ -63,7 +63,7 @@ export default class WeaponSpawner extends BaseStructure {
         this.enemiesQuantity--;
         const randomName: string = this.enemiesNames[Math.floor(Math.random() * this.enemiesNames.length -1) + 1];
         const entity = this.entitiesController.createEntities(randomName);
-        entity.position = this.position.clone();
+        entity.position = this.position.clone().add(new BABYLON.Vector3(Math.random() * 10, 0, Math.random() * 10)).clone();
     }
 
     dispose() {

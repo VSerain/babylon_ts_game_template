@@ -1,5 +1,6 @@
 import * as BABYLON from "babylonjs";
 import BaseStructure from "app/shared/base-structure"
+import EntityStructure from "app/shared/entity-structure";
 export interface StoredItem {
     name: string,
     loaded: boolean,
@@ -21,10 +22,11 @@ export interface Touchable {
     wasTouched(by: BaseStructure, at: BABYLON.AbstractMesh, pickInfo: BABYLON.PickingInfo, owner: WeaponOwner): boolean
 }
 
-export interface Weapon extends BaseStructure {
+export interface Weapon extends EntityStructure {
     owner: WeaponOwner;
-    attachToParent(parentMesh: BABYLON.Mesh, owner: WeaponOwner): void
+    attachToParent(parentNode: BABYLON.TransformNode, owner: WeaponOwner): void
     detachToParent(): void
     onParentMoveStatusChange(status: string): void
+    computeAnimation(node: BABYLON.TransformNode): void
     fire(): void
 }

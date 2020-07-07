@@ -159,7 +159,15 @@ export default class FPSCamera extends BABYLON.UniversalCamera implements Toucha
     set currentWeapon(weapon: Weapon) {
         if (this.currentWeapon) this.currentWeapon.detachToParent();
         this._currentWeapon = weapon;
+        // @todo CHanger me if is nessesary
         this.currentWeapon.attachToParent(this.body.handRight, this);
+        const weaponNode = this.currentWeapon.getNode();
+        weaponNode.parent = this.body.handRight;
+        weaponNode.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0);
+        weaponNode.position = new BABYLON.Vector3(0, -0.3, 0);
+
+        this.currentWeapon.computeAnimation(weaponNode);
+
         eventManager.call("player.activeWeapon", [weapon])
     }
 

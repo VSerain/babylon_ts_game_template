@@ -51,7 +51,7 @@ export default class WeaponSpawner extends BaseStructure {
         this.representationNode = entries.rootNodes[0];
         this.representationNode.parent = this.mesh;
         this.representationNode.position = new BABYLON.Vector3(0, 1, 0);
-        this.representationNode.rotation = new BABYLON.Vector3(0, 0, Math.PI/2);
+        this.representationNode.rotation = new BABYLON.Vector3(0, 0, 0);
 
         const animation = new BABYLON.Animation("rotate0", "rotation.y", 1, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
         animation.setKeys([
