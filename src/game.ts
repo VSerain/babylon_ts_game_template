@@ -12,6 +12,7 @@ import eventManager from "app/shared/eventManager";
 export default class Game {
 
     private isFullLoad: boolean = false;
+    private lockPointer: boolean = true;
 
     private canvas: HTMLCanvasElement;
     private engine: BABYLON.Engine;
@@ -31,12 +32,14 @@ export default class Game {
         if (!this.canvas) throw new Error(`${this.canvasId} is not found in DOM`);
 
         this.canvas.addEventListener("click", () => {
+            if (!this.lockPointer) return;
             this.canvas.requestPointerLock(); // Lock pointer to game
         });
 
         this.attachCallback();
 
         this.engine = new BABYLON.Engine(this.canvas, ENGINE_CONFIG.ANTIALIAS);
+        this.engine.loadingScreen.loadingUIText = "KývosStudio";
 
         this.loader = new Loader(this.engine, this.canvas);
         this.playerController = new PlayerController(this.loader);
@@ -56,6 +59,8 @@ export default class Game {
         window.addEventListener('resize', () => {
             this.engine.resize();
         });
+
+        eventManager.add("game.debug");
     }
 
     attachCallback() {
@@ -64,6 +69,7 @@ export default class Game {
 
     debugCamera() {
         if (!this.isFullLoad) return;
+        this.lockPointer = false;
         const scene = this.loader.scene;
         const cameraDebug = new BABYLON.UniversalCamera("debug-camera", new BABYLON.Vector3(23,9,26), scene);
         cameraDebug.attachControl(this.loader.canvas);
@@ -74,8 +80,10 @@ export default class Game {
         cameraDebug.keysUp = [90];
         cameraDebug.keysRight = [68];
         cameraDebug.keysLeft = [81];
-
         scene.activeCamera = cameraDebug;
-    }
 
+        scene.debugLayer.show()
+
+        eventManager.call("game.debug");
+    }
 }
