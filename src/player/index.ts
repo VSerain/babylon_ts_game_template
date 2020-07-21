@@ -31,7 +31,7 @@ export default class PlayerController {
      */
     addMesh(type: string, mesh: BABYLON.AbstractMesh, data?: any) {
         if (type === "player-camera") {
-            this.camera = new FPSCamera("player-camera", mesh.position.clone(), this.scene);
+            this.camera = new FPSCamera("player-camera", mesh.absolutePosition.clone(), this.scene);
             mesh.dispose();
         }
     }

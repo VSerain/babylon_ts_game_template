@@ -5,8 +5,9 @@ import * as structureHelpers from "app/shared/structure-helpers";
 
 import Loader from "app/loader/index";
 
-import Buttons from "./buttons/index"
-import Spawners from "./spawner/index"
+import Buttons from "./buttons/index";
+import Spawners from "./spawner/index";
+import Interactives from "./interactives/index";
 
 export default class ObjectsController {
     scene: BABYLON.Scene;
@@ -36,6 +37,7 @@ export default class ObjectsController {
     initTypes() {
         this.types.push(...Buttons);
         this.types.push(...Spawners);
+        this.types.push(...Interactives);
 
         this.types.forEach((module) => {
             this.loader.addObjectsType(module.name);

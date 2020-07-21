@@ -112,8 +112,8 @@ export default class Loader {
         this.entitiesController.scene = this.scene;
 
         // this.__dev__spawnButton();
-        this.__dev__spawnWeaponSpawner();
-        this.__dev__spawnEnemiesSpawner();
+        // this.__dev__spawnWeaponSpawner();
+        // this.__dev__spawnEnemiesSpawner();
         eventManager.call("loader.beforeImportMap");
 
         BABYLON.SceneLoader.Append(IMPORT_GLB.FOLDER_PATH, IMPORT_GLB.MAP_FILE_NAME, this.scene, () => {
@@ -129,6 +129,7 @@ export default class Loader {
                         type = data.type;
                     }
                 }
+                if (mesh.name === "__root__") mesh.rotationQuaternion = new BABYLON.Vector3(0, 4.7 ,0).toQuaternion();
                 this.loadMesh(type, mesh, data);
             });
 
