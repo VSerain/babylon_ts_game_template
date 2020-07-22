@@ -1,4 +1,5 @@
 import * as BABYLON from "babylonjs";
+
 import PlayerController from "app/player/index";
 import ObjectsController from "app/objects/index";
 import EntitiesController from "app/entities/index";
@@ -6,7 +7,16 @@ import SceneryController from "app/scenery/index";
 
 import { getRandomString } from "./global-helpers";
 
-export default class Structure {
+export default class BaseStucture {
+    name: string = getRandomString();
+    isTouchable: boolean = false;
+
+    $data = {
+        position: new BABYLON.Vector3(),
+        rotation: new BABYLON.Vector3(),
+        scaling: new BABYLON.Vector3(),
+    } as any;
+
     require = {
         playerController: false,
         objectsController: false,
@@ -14,11 +24,13 @@ export default class Structure {
         sceneryController: false,
     }
 
-    name: string = getRandomString();
-
-    constructor(protected mesh: BABYLON.Mesh, data: any = {}) {
+ 
+    constructor(data: any) {
+        this.$data = {
+            ...this.$data,
+            ...data
+        };
         this.name = data.name || this.name;
-        this.mesh.metadata.instance = this;
     }
 
     load(){}
@@ -30,27 +42,25 @@ export default class Structure {
     sceneryController: SceneryController;
 
     get position() {
-        return this.mesh.position;
+        return this.$data.position;
     }
-    set position(position) {
-        this.mesh.position = position;
-    }
-
-    get absolutePosition() {
-        return this.mesh.getAbsolutePosition();
+    set position(position: BABYLON.Vector3) {
+        this.$data.position = position;
     }
 
     get rotation() {
-        return this.mesh.rotation;
+        return this.$data.rotation;
     }
-    set rotation(rotation) {
-        this.mesh.rotation = rotation;
+    set rotation(rotation: BABYLON.Vector3) {
+        this.$data.rotation = rotation;
     }
 
     get scaling() {
-        return this.mesh.scaling;
+        return this.$data.scaling;
     }
-    set scaling(scaling) {
-        this.mesh.scaling = scaling;
+    set scaling(scaling: BABYLON.Vector3) {
+        this.$data.scaling = scaling;
     }
+
+    dispose() {}
 }

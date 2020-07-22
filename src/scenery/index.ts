@@ -1,7 +1,7 @@
 import * as BABYLON from "babylonjs";
 import eventManager from "app/shared/eventManager";
-import Structure from "app/shared/structure";
-import { applyController, StructureConstructor} from "app/shared/structure-helpers";
+import ObjectStructure from "app/shared/object-structure";
+import { applyController, ObjectStructureConstructor} from "app/shared/structure-helpers";
 
 import Loader from "app/loader/index";
 
@@ -10,7 +10,7 @@ import Ground from "./types/ground";
 
 interface Type {
     name: string,
-    class: StructureConstructor
+    class: ObjectStructureConstructor
 }
 
 export default class SceneryController {
@@ -68,12 +68,12 @@ export default class SceneryController {
         
         this._types.push({
             name: "default",
-            class: Structure as StructureConstructor
+            class: ObjectStructure as ObjectStructureConstructor
         });
         Types.forEach((type: any) => {
             this._types.push({
                 name: type.name as string,
-                class: type.default as StructureConstructor
+                class: type.default as ObjectStructureConstructor
             })
         });
 

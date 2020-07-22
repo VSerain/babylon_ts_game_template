@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "watch": "concurrently \"webpack --watch\" \"http-server -p 3066\"",
+    "dev": "npm run watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Victor Serain",
