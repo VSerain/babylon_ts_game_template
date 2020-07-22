@@ -5,9 +5,11 @@ import ObjectsController from "app/objects/index";
 import EntitiesController from "app/entities/index";
 import SceneryController from "app/scenery/index";
 
-export default class BaseStucture {
+import { getRandomString } from "./global-helpers";
 
-    name: string = (new Date().getTime() + Math.random() * Math.random()).toString();
+export default class BaseStucture {
+    name: string = getRandomString();
+    isTouchable: boolean = false;
 
     $data = {
         position: new BABYLON.Vector3(),
@@ -22,8 +24,7 @@ export default class BaseStucture {
         sceneryController: false,
     }
 
-    isTouchable: boolean = false;
-
+ 
     constructor(data: any) {
         this.$data = {
             ...this.$data,
