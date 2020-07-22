@@ -8,5 +8,5 @@ export const ENGINE_CONFIG = {
 
 export const IMPORT_GLB = {
     FOLDER_PATH: "assets/glb/",
-    MAP_FILE_NAME: "map1.glb",
+    MAP_FILE_NAME: "map.glb",
 }
