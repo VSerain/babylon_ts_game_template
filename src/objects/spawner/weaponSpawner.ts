@@ -49,8 +49,7 @@ export default class WeaponSpawner extends BaseStructure {
     spawnMeshRepresentation() {
         const entries = this.entitiesController.store.getEntries(this.weaponName);
         this.representationNode = entries.rootNodes[0];
-        this.representationNode.parent = this.mesh;
-        this.representationNode.position = new BABYLON.Vector3(0, 1, 0);
+        this.representationNode.position = this.position.add(new BABYLON.Vector3(0, 0.75, 0));
         this.representationNode.rotation = new BABYLON.Vector3(0, 0, 0);
 
         const animation = new BABYLON.Animation("rotate0", "rotation.y", 1, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);

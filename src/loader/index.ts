@@ -129,7 +129,6 @@ export default class Loader {
                         type = data.type;
                     }
                 }
-                if (mesh.name === "__root__") mesh.rotationQuaternion = new BABYLON.Vector3(0, 4.7 ,0).toQuaternion();
                 this.loadMesh(type, mesh, data);
             });
 

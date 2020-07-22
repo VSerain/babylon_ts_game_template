@@ -18,9 +18,13 @@ export default class DefaultButton extends BaseStructure {
      * @param data params of structure
      * @param data.name is the unique name of structrue
      * @param data.animation is the name of animation start on event interactive is up
+     * @param data.multiple (optional) interaction number posibility
      */
     constructor(mesh: BABYLON.Mesh, data: any = {}) {
-        super(mesh, data);
+        super(mesh, {
+            multiple: 1,
+            ...data
+        });
         this.require.playerController = true;
         this.require.sceneryController = true;
     }
@@ -36,13 +40,14 @@ export default class DefaultButton extends BaseStructure {
 
         eventManager.on("player.input.interactive.on", {}, () => {
             if (!this.eventActive || this.animationInPlay) return;
+            this.$data.multiple--;
             this.startEvent();
         });
     }
 
     renderLoop() {
         const distanceToPlayer = BABYLON.Vector3.Distance(this.position, this.playerController.camera.position);
-        this.eventActive = distanceToPlayer < MINIMAL_DIST_EVENT;
+        this.eventActive = distanceToPlayer < MINIMAL_DIST_EVENT && this.$data.multiple > 0;
         if (this.eventActive && !this.animationInPlay) {
             eventManager.call("interactive-object.message.show");
         }
