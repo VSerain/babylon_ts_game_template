@@ -4,6 +4,8 @@ import ObjectsController from "app/objects/index";
 import EntitiesController from "app/entities/index";
 import SceneryController from "app/scenery/index";
 
+import { getRandomString } from "./global-helpers";
+
 export default class Structure {
     require = {
         playerController: false,
@@ -12,7 +14,7 @@ export default class Structure {
         sceneryController: false,
     }
 
-    name: string = (new Date().getTime() + Math.random() * Math.random()).toString();
+    name: string = getRandomString();
 
     constructor(protected mesh: BABYLON.Mesh, data: any = {}) {
         this.name = data.name || this.name;

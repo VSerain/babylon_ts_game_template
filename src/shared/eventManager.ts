@@ -1,3 +1,5 @@
+import { getRandomString } from "./global-helpers";
+
 interface EventOption {
     layer: number
     filter?: (...args: Array<any>) => boolean
@@ -9,6 +11,7 @@ interface CallbackFunction  {
 
 interface CallbackObject {
     callback: CallbackFunction,
+    id: string,
     option: EventOption,
 }
 
@@ -21,8 +24,15 @@ interface StackEvent extends Array<Event> {
     [index: number]: Event
 }
 
+interface CallbackStored {
+    callbackObject: CallbackObject,
+    event: Event,
+    id: string
+}
+
 class EventManager {
     private events: StackEvent = [];
+    private callbacks: Array<CallbackStored> = [];
 
     /**
      * Register event
@@ -66,18 +76,26 @@ class EventManager {
 
         // Found pos in callback stack
         const position = event.callbacks.findIndex(cbObject => cbObject.option.layer > option.layer);
+        const callbackObject = {
+            callback,
+            id: option.name as string || getRandomString(),
+            option
+        }
+
         if (position != -1) {
-            event.callbacks.splice(position, 0, {
-                callback,
-                option
-            });
+            event.callbacks.splice(position, 0, callbackObject);
         }
         else {
-            event.callbacks.push({
-                callback,
-                option
-            });
+            event.callbacks.push(callbackObject);
         }
+
+        this.callbacks.push({
+            event,
+            callbackObject,
+            id: callbackObject.id
+        });
+
+        return callbackObject.id;
     }
 
     /**
@@ -123,6 +141,20 @@ class EventManager {
         }
     
         return event;
+    }
+
+    /**
+     * Remove callback on event
+     * 
+     * @param callbackId The id or name of the removed callback
+     */
+    removeCallback(callbackId: string) {
+        const callback = this.callbacks.find(callback => callback.id === callbackId);
+        if (!callback) return;
+
+        const indexInEvent = callback.event.callbacks.findIndex(cb => cb.id === callbackId);
+        if (indexInEvent === -1) return;
+        callback.event.callbacks.splice(indexInEvent,1);
     }
 }
 
