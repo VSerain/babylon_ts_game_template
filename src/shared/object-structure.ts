@@ -12,10 +12,10 @@ export default class ObjectStructure extends BaseStructure implements Touchable 
     }
 
     get position() {
-        return this.mesh.position;
+        return this.mesh.getAbsolutePosition();
     }
     set position(position) {
-        this.mesh.position = position;
+        this.mesh.setAbsolutePosition(position);
     }
 
     get absolutePosition() {
